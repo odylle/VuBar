@@ -1,15 +1,15 @@
 local addon, ns = ...
-local config = ns.config
+local V = ns.V
 
 ----------------------------------
 -- System Frame
 ----------------------------------
-local systemFrame = CreateFrame("BUTTON","$parentSystem", frames.left)
+local systemFrame = CreateFrame("BUTTON","$parentSystem", V.frames.left)
 systemFrame:SetPoint("TOP",0,-101)
-systemFrame:SetSize(config.frame.width, 20)
+systemFrame:SetSize(V.config.frame.width, 20)
 systemFrame:EnableMouse(true)
 systemFrame:RegisterForClicks("AnyUp")
-if config.debug then
+if V.config.debug then
      systemFrame:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
      systemFrame:SetBackdropColor(0, 0, 0, 0.2)
 end
@@ -20,7 +20,7 @@ end
 local pingFrame = CreateFrame("FRAME",nil, systemFrame)
 
 local pingText = pingFrame:CreateFontString(nil, "OVERLAY")
-pingText:SetFont(config.text.font, config.text.normalFontSize)
+pingText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 pingText:SetTextColor(.6,.6,.6)
 pingText:SetJustifyH("LEFT")
 pingText:SetPoint("LEFT", systemFrame, "LEFT", 6, 0)
@@ -31,7 +31,7 @@ pingText:SetPoint("LEFT", systemFrame, "LEFT", 6, 0)
 local fpsFrame = CreateFrame("FRAME",nil, systemFrame)
 
 local fpsText = fpsFrame:CreateFontString(nil, "OVERLAY")
-fpsText:SetFont(config.text.font, config.text.normalFontSize)
+fpsText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 fpsText:SetTextColor(.6,.6,.6)
 fpsText:SetJustifyH("RIGHT")
 fpsText:SetPoint("RIGHT", systemFrame, "RIGHT", -6, 0)

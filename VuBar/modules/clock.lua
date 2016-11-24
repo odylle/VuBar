@@ -1,18 +1,17 @@
 local addon, ns = ...
-local config = ns.config
-local frames = ns.frames
+local V = ns.V
 
 local hour, minutes = 0,0
 
 ----------------------------------
 -- The Clock Frame
 ----------------------------------
-local clockFrame = CreateFrame("BUTTON","$parentClock", frames.left)
+local clockFrame = CreateFrame("BUTTON","$parentClock", V.frames.left)
 clockFrame:SetPoint("TOP")
-clockFrame:SetSize(config.frame.width, 100)
+clockFrame:SetSize(V.config.frame.width, 100)
 clockFrame:EnableMouse(true)
 clockFrame:RegisterForClicks("AnyUp")
-if config.debug then
+if V.config.debug then
 	clockFrame:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
 	clockFrame:SetBackdropColor(0, 0, 0, 0.2)
 end
@@ -20,22 +19,22 @@ end
 local clockText = clockFrame:CreateFontString(nil, "OVERLAY")
 clockText:SetPoint("CENTER")
 clockText:SetHeight(100)
-clockText:SetFont(config.text.font, config.text.bigFontSize)
+clockText:SetFont(V.config.text.font, V.config.text.bigFontSize)
 clockText:SetTextColor(.9,.9,.9)
 clockText:SetAllPoints()
 
 local calendarText = clockFrame:CreateFontString(nil, "OVERLAY")
-calendarText:SetFont(config.text.font, config.text.normalFontSize)
+calendarText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 calendarText:SetPoint("TOP", clockFrame, "TOP", 0, -18)
 calendarText:SetTextColor(.6,.6,.6)
 
 local restingText = clockFrame:CreateFontString(nil, "OVERLAY")
-restingText:SetFont(config.text.font, config.text.normalFontSize)
+restingText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 restingText:SetPoint("BOTTOM", 0, 30)
 restingText:SetTextColor(.6,.6,.6)
 
 local afkText = clockFrame:CreateFontString(nil, "OVERLAY")
-afkText:SetFont(config.text.font, config.text.normalFontSize)
+afkText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 afkText:SetPoint("TOPLEFT", 51, -30)
 afkText:SetTextColor(.6,.6,.6)
 
@@ -77,7 +76,7 @@ clockFrame:SetScript('OnUpdate', function(self, e)
 			calendarText:SetText("")
 		end
 		--clockFrame:SetWidth(clockText:GetStringWidth() + amText:GetStringWidth())
-		--clockFrame:SetPoint("CENTER", config.lframe)		
+		--clockFrame:SetPoint("CENTER", V.config.lframe)		
 		elapsed = 0
 	end
 end)

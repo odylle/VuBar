@@ -1,25 +1,25 @@
 local addon, ns = ...
-local config = ns.config
+local V = ns.V
 
 ----------------------------------
 -- Armor Frame
 ----------------------------------
-local armorFrame = CreateFrame("FRAME","$parentArmor", frames.left)
+local armorFrame = CreateFrame("FRAME","$parentArmor", V.frames.left)
 armorFrame:SetPoint("TOP",0,-294)
-armorFrame:SetSize(config.frame.width, 20)
-if config.debug then
+armorFrame:SetSize(V.config.frame.width, 20)
+if V.config.debug then
      armorFrame:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
      armorFrame:SetBackdropColor(0, 0, 0, 0.2)
 end
 
 local armorLText = armorFrame:CreateFontString(nil, "OVERLAY")
-armorLText:SetFont(config.text.font, config.text.normalFontSize)
+armorLText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 armorLText:SetTextColor(.6,.6,.6)
 armorLText:SetJustifyH("LEFT")
 armorLText:SetPoint("LEFT", armorFrame, "LEFT", 8, 0)
 
 local armorRText = armorFrame:CreateFontString(nil, "OVERLAY")
-armorRText:SetFont(config.text.font, config.text.normalFontSize)
+armorRText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 armorRText:SetJustifyH("RIGHT")
 armorRText:SetPoint("RIGHT", armorFrame, "RIGHT",-6,0)
 --armorText:SetText("100%")

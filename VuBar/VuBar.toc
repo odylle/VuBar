@@ -13,17 +13,25 @@ modules\armor.lua
 modules\clock.lua
 modules\system.lua
 # modules\config.lua
-# modules\talent.lua
+modules\talent.lua
 # modules\tradeskill.lua
 # modules\heartstone.lua
 
 # New
 modules\resources.lua
 modules\minimap.lua
-# modules\details.lua
-# modules\bars.lua
-# Inspiration: SX_Databars, XIV, Some UI Sidebar, Ponies.
+# modules\details.lua - This one is prestigious and requires more work ;)
+modules\bars.lua
+modules\vehicle.lua
+modules\group.lua
+modules\instance.lua
+# modules\farm.lua
 
+
+# TEST
+modules/_move.lua
+
+# Inspiration: SX_Databars, XIV, Some UI Sidebar, Ponies.
 # Deprecating/ Combined
 # modules\gold.lua
 # modules\currency.lua

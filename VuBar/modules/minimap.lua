@@ -1,5 +1,6 @@
 local addon, ns = ...
-local config = ns.config
+local V = ns.V
+--local V.config = ns.V.config
 
 --[[
 Zoom, InstanceDifficulty, ClassHall link, Ping, 
@@ -14,10 +15,10 @@ MinimapCluster:SetSize(138,138)
 ----------------------------------
 -- Minimap Frame
 ----------------------------------
-local minimapFrame = CreateFrame("FRAME","$parentMinimap", frames.right)
+local minimapFrame = CreateFrame("FRAME","$parentMinimap", V.frames.right)
 minimapFrame:SetPoint("TOP",0,-20)
-minimapFrame:SetSize(config.frame.width, 140)
-if config.debug then
+minimapFrame:SetSize(V.config.frame.width, 140)
+if V.config.debug then
      minimapFrame:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
      minimapFrame:SetBackdropColor(0, 0, 0, 0.2)
 end
@@ -26,7 +27,7 @@ MinimapCluster:ClearAllPoints()
 MinimapCluster:SetPoint('TOPRIGHT', UIParent, 'TOPRIGHT', 0, 0)
 MinimapCluster:EnableMouse(false)
 MinimapCluster:SetClampedToScreen(false)
-MinimapCluster:SetSize(config.frame.width,140)
+MinimapCluster:SetSize(V.config.frame.width,140)
 
 Minimap:SetParent(minimapFrame)
 Minimap:SetSize(138, 138)
@@ -134,11 +135,11 @@ local function GetZoneColor()
 end
 
 local locationFrame = CreateFrame("FRAME","$parentLocation", minimapFrame)
-locationFrame:SetSize(config.frame.width,20)
+locationFrame:SetSize(V.config.frame.width,20)
 locationFrame:SetPoint("TOP",0,20)
 
 local locationText = locationFrame:CreateFontString(nil, "OVERLAY")
-locationText:SetFont(config.text.font, 12)
+locationText:SetFont(V.config.text.font, 12)
 locationText:SetPoint("CENTER",0,2)
 locationText:SetTextColor(GetZoneColor())
 if GetSubZoneText() == '' then
@@ -162,40 +163,31 @@ end)
 MiniMapMailIcon:Hide()
 
 local mailFrame = CreateFrame("FRAME","$parentMail", minimapFrame)
-mailFrame:SetSize(config.frame.width,20)
+mailFrame:SetSize(V.config.frame.width,20)
 mailFrame:SetPoint("BOTTOM",0,-20)
 
 MiniMapMailFrame:ClearAllPoints()
 MiniMapMailFrame:SetParent(mailFrame)
-MiniMapMailFrame:SetSize(config.frame.width,20)
+MiniMapMailFrame:SetSize(V.config.frame.width,20)
 MiniMapMailFrame:SetFrameStrata('HIGH')
 MiniMapMailFrame:SetPoint('BOTTOMRIGHT', mailFrame, 0, 0)
 
 local mailText = mailFrame:CreateFontString(nil, "OVERLAY")
-mailText:SetFont(config.text.font, config.text.normalFontSize)
+mailText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 mailText:SetPoint("CENTER",0,2)
 mailText:SetTextColor(.6,.6,.6)
 --mailText:SetText(string.format("|cffff0000new mail waiting|r"))
 
+local ag = mailFrame:CreateAnimationGroup()
+local a1 = ag:CreateAnimation("Alpha")
+a1:SetChange(-0.5)
+a1:SetDuration(3)
+a1:SetSmoothing("OUT")
 
--- local alpha = 0
--- local elapsed = 0
--- local ascending, descending = true
--- mailFrame:HookScript('OnUpdate', function(self, e)
---     elapsed = elapsed + e
---     if elapsed >= 1 then
---         if alpha == 0 and alpha < 1.1 then
---             ascending, descending = true, false
---             if ascending then
---                 alpha = alpha + .1
---             end
---         elseif alpha == 1 then
-
-
---         end
---         elapsed = 0
---     end
--- end)
+local a2 = ag:CreateAnimation("Alpha")
+a2:SetChange(0.5)
+a2:SetDuration(3)
+a2:SetSmoothing("OUT")
 
 ----------------------------------
 -- Event Frame
@@ -204,7 +196,11 @@ local eventframe = CreateFrame("Frame")
 eventframe:RegisterEvent("PLAYER_ENTERING_WORLD")
 eventframe:RegisterEvent("UPDATE_PENDING_MAIL")
 eventframe:SetScript("OnEvent", function(self,event, ...)
-     if HasNewMail() then
-          mailText:SetText(string.format("|cffff0000new mail|r"))
-     end    
+    if HasNewMail() then
+        mailText:SetText(string.format("|cffff0000new mail|r"))
+        ag:Play()
+    else
+        mailText:SetText("")
+        ag:Stop()
+    end    
 end)

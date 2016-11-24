@@ -1,13 +1,13 @@
 local addon, ns = ...
-local config = ns.config
+local V = ns.V
 
 ----------------------------------
 -- Social Frame
 ----------------------------------
-local socialFrame = CreateFrame("FRAME","$parentSocial", frames.left)
+local socialFrame = CreateFrame("FRAME","$parentSocial", V.frames.left)
 socialFrame:SetPoint("TOP",0,-132)
-socialFrame:SetSize(config.frame.width, 60)
-if config.debug then
+socialFrame:SetSize(V.config.frame.width, 60)
+if V.config.debug then
      socialFrame:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
      socialFrame:SetBackdropColor(0, 0, 0, 0.2)
 end
@@ -16,11 +16,11 @@ end
 -- Header Frame
 ----------------------------------
 local headerFrame = CreateFrame("FRAME","nil", socialFrame)
-headerFrame:SetSize(config.frame.width, 20)
+headerFrame:SetSize(V.config.frame.width, 20)
 headerFrame:SetPoint("TOP")
 
 local headerText = headerFrame:CreateFontString(nil, "OVERLAY")
-headerText:SetFont(config.text.font, config.text.normalFontSize)
+headerText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 headerText:SetTextColor(onfig.text.header.color)
 headerText:SetJustifyH("CENTER")
 headerText:SetPoint("LEFT", headerFrame, "LEFT", 6, 0)
@@ -30,19 +30,19 @@ headerText:SetText("social")
 -- Friends Frame
 ----------------------------------
 local friendFrame = CreateFrame("BUTTON",nil, headerFrame)
-friendFrame:SetSize(config.frame.width, 20)
+friendFrame:SetSize(V.config.frame.width, 20)
 friendFrame:SetPoint("TOP",0,-20)
 -- needs to be clickable for friends pane
 
 local friendText = friendFrame:CreateFontString(nil, "OVERLAY")
-friendText:SetFont(config.text.font, config.text.normalFontSize)
+friendText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 friendText:SetTextColor(.6,.6,.6)
 friendText:SetJustifyH("LEFT")
 friendText:SetPoint("LEFT", friendFrame, "LEFT", 8, 0)
 friendText:SetText("friends")
 
 local fonlineText = friendFrame:CreateFontString(nil, "OVERLAY")
-fonlineText:SetFont(config.text.font, config.text.normalFontSize)
+fonlineText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 fonlineText:SetTextColor(1,1,1)
 fonlineText:SetJustifyH("RIGHT")
 fonlineText:SetPoint("RIGHT", friendFrame, "RIGHT", -8, 0)
@@ -51,8 +51,8 @@ fonlineText:SetText("0")
 
 friendFrame:SetScript("OnEnter", function()
 	if InCombatLockdown() then return end
-	--friendIcon:SetVertexColor(unpack(config.color.hover))
-	--if not config.micromenu.showTooltip then return end
+	--friendIcon:SetVertexColor(unpack(V.config.color.hover))
+	--if not V.config.micromenu.showTooltip then return end
 	local totalBNet, numBNetOnline = BNGetNumFriends()
 	if numBNetOnline then
 	GameTooltip:SetOwner(friendFrame, "ANCHOR_BOTTOMRIGHT",0,0)
@@ -159,19 +159,19 @@ end)
 -- Guild Frame
 ----------------------------------
 local guildFrame = CreateFrame("BUTTON",nil, headerFrame)
-guildFrame:SetSize(config.frame.width, 20)
+guildFrame:SetSize(V.config.frame.width, 20)
 guildFrame:SetPoint("TOP",0,-40)
 -- needs to be clickable for guilds pane
 
 local guildText = guildFrame:CreateFontString(nil, "OVERLAY")
-guildText:SetFont(config.text.font, config.text.normalFontSize)
+guildText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 guildText:SetTextColor(.6,.6,.6)
 guildText:SetJustifyH("LEFT")
 guildText:SetPoint("LEFT", guildFrame, "LEFT", 8, 0)
 guildText:SetText("guild")
 
 local gonlineText = guildFrame:CreateFontString(nil, "OVERLAY")
-gonlineText:SetFont(config.text.font, config.text.normalFontSize)
+gonlineText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 gonlineText:SetTextColor(1,1,1)
 gonlineText:SetJustifyH("RIGHT")
 gonlineText:SetPoint("RIGHT", guildFrame, "RIGHT", -8, 0)

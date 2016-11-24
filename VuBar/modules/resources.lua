@@ -1,13 +1,13 @@
 local addon, ns = ...
-local config = ns.config
+local V = ns.V
 
 ----------------------------------
 -- Resources Frame
 ----------------------------------
-local resourcesFrame = CreateFrame("FRAME",nil, frames.left)
+local resourcesFrame = CreateFrame("FRAME","$parentResources", V.frames.left)
 resourcesFrame:SetPoint("TOP",0,-203)
-resourcesFrame:SetSize(config.frame.width, 80)
-if config.debug then
+resourcesFrame:SetSize(V.config.frame.width, 80)
+if V.config.debug then
      resourcesFrame:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
      resourcesFrame:SetBackdropColor(0, 0, 0, 0.2)
 end
@@ -16,12 +16,12 @@ end
 -- Header Frame
 ----------------------------------
 local headerFrame = CreateFrame("FRAME",nil, resourcesFrame)
-headerFrame:SetSize(config.frame.width, 20)
+headerFrame:SetSize(V.config.frame.width, 20)
 headerFrame:SetPoint("TOP")
 
 local headerText = headerFrame:CreateFontString(nil, "OVERLAY")
-headerText:SetFont(config.text.font, config.text.normalFontSize)
-headerText:SetTextColor(config.text.header.color)
+headerText:SetFont(V.config.text.font, V.config.text.normalFontSize)
+headerText:SetTextColor(V.config.text.header.color)
 headerText:SetJustifyH("CENTER")
 headerText:SetPoint("LEFT", headerFrame, "LEFT", 6, 0)
 headerText:SetText("resources")
@@ -30,11 +30,11 @@ headerText:SetText("resources")
 -- Gold Frame
 ----------------------------------
 local goldFrame = CreateFrame("BUTTON",nil, headerFrame)
-goldFrame:SetSize(config.frame.width, 20)
+goldFrame:SetSize(V.config.frame.width, 20)
 goldFrame:SetPoint("TOP",0,-20)
 
 local goldText = goldFrame:CreateFontString(nil, "OVERLAY")
-goldText:SetFont(config.text.font, config.text.normalFontSize)
+goldText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 goldText:SetTextColor(1,1,1)
 goldText:SetJustifyH("RIGHT")
 goldText:SetPoint("RIGHT", goldFrame, "RIGHT", -8, 0)
@@ -44,19 +44,19 @@ goldText:SetText("0")
 -- Reroll Frame
 ----------------------------------
 local rerollFrame = CreateFrame("BUTTON",nil, headerFrame)
-rerollFrame:SetSize(config.frame.width, 20)
+rerollFrame:SetSize(V.config.frame.width, 20)
 rerollFrame:SetPoint("TOP",0,-40)
 -- needs to be clickable for rerolls pane
 
 local rerollLText = rerollFrame:CreateFontString(nil, "OVERLAY")
-rerollLText:SetFont(config.text.font, config.text.normalFontSize)
+rerollLText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 rerollLText:SetTextColor(.6,.6,.6)
 rerollLText:SetJustifyH("LEFT")
 rerollLText:SetPoint("LEFT", rerollFrame, "LEFT", 8, 0)
 rerollLText:SetText("seals")
 
 local rerollRText = rerollFrame:CreateFontString(nil, "OVERLAY")
-rerollRText:SetFont(config.text.font, config.text.normalFontSize)
+rerollRText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 rerollRText:SetTextColor(1,1,1)
 rerollRText:SetJustifyH("RIGHT")
 rerollRText:SetPoint("RIGHT", rerollFrame, "RIGHT", -8, 0)
@@ -64,8 +64,8 @@ rerollRText:SetText("0")
 
 rerollFrame:SetScript("OnEnter", function()
      if InCombatLockdown() then return end
-     --rerollIcon:SetVertexColor(unpack(config.color.hover))
-     --if not config.currency.showTooltip then return end
+     --rerollIcon:SetVertexColor(unpack(V.config.color.hover))
+     --if not V.config.currency.showTooltip then return end
      GameTooltip:SetOwner(resourcesFrame, "ANCHOR_BOTTOMRIGHT",0,0)
      GameTooltip:AddLine("[|cff6699FFReroll|r]")
      GameTooltip:AddLine(" ")
@@ -98,19 +98,19 @@ end)
 -- Order Resources - 1220
 ----------------------------------
 local orderFrame = CreateFrame("BUTTON",nil, headerFrame)
-orderFrame:SetSize(config.frame.width, 20)
+orderFrame:SetSize(V.config.frame.width, 20)
 orderFrame:SetPoint("TOP",0,-60)
 -- needs to be clickable for orders pane
 
 local orderLText = orderFrame:CreateFontString(nil, "OVERLAY")
-orderLText:SetFont(config.text.font, config.text.normalFontSize)
+orderLText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 orderLText:SetTextColor(.6,.6,.6)
 orderLText:SetJustifyH("LEFT")
 orderLText:SetPoint("LEFT", orderFrame, "LEFT", 8, 0)
 orderLText:SetText("order resources")
 
 local orderRText = orderFrame:CreateFontString(nil, "OVERLAY")
-orderRText:SetFont(config.text.font, config.text.normalFontSize)
+orderRText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 orderRText:SetTextColor(1,1,1)
 orderRText:SetJustifyH("RIGHT")
 orderRText:SetPoint("RIGHT", orderFrame, "RIGHT", -8, 0)
