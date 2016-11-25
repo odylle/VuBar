@@ -15,32 +15,36 @@ Question: Can frames be offscreen?
 ----------------------------------
 
 local moveFrame = CreateFrame("BUTTON","$parentmove", V.frames.left)
-moveFrame:SetPoint("BOTTOM",0,100)
+moveFrame:SetPoint("BOTTOM",- V.config.frame.width,100)
 moveFrame:SetSize(V.config.frame.width, 20)
 if V.config.debug then
     moveFrame:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
     moveFrame:SetBackdropColor(0, 0, 0, 0.2)
 end
 
+moveFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+moveFrame:RegisterEvent("PLAYER_UPDATE_RESTING")
+
+
 local ag1 = moveFrame:CreateAnimationGroup()
+ag1:SetScript("onFinished", function()
+    moveFrame:SetPoint("BOTTOM",V.config.frame.width,100)
+end)
 local moveout = ag1:CreateAnimation("Translation")
-moveout:SetOffSet(V.config.frames.width,0)
-moveout:SetDuration(3)
+moveout:SetOffset(V.config.frame.width,0)
+moveout:SetDuration(.6)
 moveout:SetSmoothing("OUT")
 
 local ag2 = moveFrame:CreateAnimationGroup()
+ag2:SetScript("onFinished", function()
+    moveFrame:SetPoint("BOTTOM",0,100)
+end)
 local movein = ag2:CreateAnimation("Translation")
-movein:SetOffSet(0,0)
-movein:SetDuration(3)
+movein:SetOffset(-V.config.frame.width+10,0)
+movein:SetDuration(.6)
 movein:SetSmoothing("OUT")
 
-
-----------------------------------
--- The Event Trigger
-----------------------------------
-local eventframe = CreateFrame("Frame")
-eventframe:RegisterEvent("PLAYER_UPDATE_RESTING")
-eventframe:SetScript("onEvent", function(self,event, ...) 
+moveFrame:SetScript("onEvent", function(self,event, ...) 
     if IsResting() then
         if ag2:IsPlaying() then
             delay = 3 - ag2:GetElapsed()
@@ -56,3 +60,4 @@ eventframe:SetScript("onEvent", function(self,event, ...)
     end
 
 end)
+

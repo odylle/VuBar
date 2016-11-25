@@ -10,14 +10,15 @@ MinimapCluster:ClearAllPoints()
 MinimapCluster:SetPoint('TOPRIGHT', UIParent, 'TOPRIGHT', -1, 0)
 MinimapCluster:EnableMouse(false)
 MinimapCluster:SetClampedToScreen(false)
-MinimapCluster:SetSize(138,138)
+MinimapCluster:SetSize(V.config.frame.width-2,V.config.frame.width-2)
 
 ----------------------------------
 -- Minimap Frame
 ----------------------------------
 local minimapFrame = CreateFrame("FRAME","$parentMinimap", V.frames.right)
 minimapFrame:SetPoint("TOP",0,-20)
-minimapFrame:SetSize(V.config.frame.width, 140)
+minimapFrame:SetFrameStrata("BACKGROUND")
+minimapFrame:SetSize(V.config.frame.width, V.config.frame.width)
 if V.config.debug then
      minimapFrame:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
      minimapFrame:SetBackdropColor(0, 0, 0, 0.2)
@@ -27,10 +28,10 @@ MinimapCluster:ClearAllPoints()
 MinimapCluster:SetPoint('TOPRIGHT', UIParent, 'TOPRIGHT', 0, 0)
 MinimapCluster:EnableMouse(false)
 MinimapCluster:SetClampedToScreen(false)
-MinimapCluster:SetSize(V.config.frame.width,140)
+MinimapCluster:SetSize(V.config.frame.width, V.config.frame.width)
 
 Minimap:SetParent(minimapFrame)
-Minimap:SetSize(138, 138)
+Minimap:SetSize(V.config.frame.width-2, V.config.frame.width-2)
 Minimap:SetMaskTexture[[Interface\ChatFrame\ChatFrameBackground]]
 Minimap:ClearAllPoints()
 Minimap:SetPoint("TOPRIGHT",-1,-1)
@@ -42,8 +43,6 @@ Minimap:SetScript('OnMouseUp', function(self, button)
     Minimap:StopMovingOrSizing()
     if button == 'RightButton' then
         ToggleDropDownMenu(1, nil, MiniMapTrackingDropDown, self, - (Minimap:GetWidth() * .7), -3)
-    elseif button == 'MiddleButton' then
-        ToggleCalendar()
     else
         Minimap_OnClick(self)
     end
@@ -180,14 +179,18 @@ mailText:SetTextColor(.6,.6,.6)
 
 local ag = mailFrame:CreateAnimationGroup()
 local a1 = ag:CreateAnimation("Alpha")
-a1:SetChange(-0.5)
-a1:SetDuration(3)
-a1:SetSmoothing("OUT")
+a1:SetChildKey("Glow")
+a1:SetOrder(1)
+a1:SetFromAlpha(0)
+a1:SetToAlpha(1)
+a1:SetDuration(0.6)
 
 local a2 = ag:CreateAnimation("Alpha")
-a2:SetChange(0.5)
-a2:SetDuration(3)
-a2:SetSmoothing("OUT")
+a2:SetChildKey("Glow")
+a2:SetOrder(2)
+a2:SetFromAlpha(1)
+a2:SetToAlpha(0)
+a2:SetDuration(0.6)
 
 ----------------------------------
 -- Event Frame
@@ -199,6 +202,7 @@ eventframe:SetScript("OnEvent", function(self,event, ...)
     if HasNewMail() then
         mailText:SetText(string.format("|cffff0000new mail|r"))
         ag:Play()
+        ag:SetLooping("REPEAT")
     else
         mailText:SetText("")
         ag:Stop()

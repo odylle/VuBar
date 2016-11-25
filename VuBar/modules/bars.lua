@@ -21,9 +21,10 @@ Plan:
 ----------------------------------
 -- Bars Frame
 ----------------------------------
-local frameheight = nil
+local frameheight = 0
 if UnitLevel("player") == maxlevel then V.frames.bars.experience = false end
 for i, bar in ipairs(V.frames.bars) do
+    print("Gevonden"..i)
     if bar then
         frameheight = frameheight + 20
     end
@@ -31,7 +32,7 @@ end
 local barsFrame = CreateFrame("FRAME","$parentBars", V.frames.right)
 barsFrame:SetPoint("TOP",0,-400)
 barsFrame:SetSize(V.config.frame.width, frameheight)
-if config.debug then
+if V.config.debug then
      barsFrame:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
      barsFrame:SetBackdropColor(0, 0, 0, 0.2)
 end

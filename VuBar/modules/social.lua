@@ -1,6 +1,6 @@
 local addon, ns = ...
 local V = ns.V
-
+local unpack = unpack
 ----------------------------------
 -- Social Frame
 ----------------------------------
@@ -21,7 +21,7 @@ headerFrame:SetPoint("TOP")
 
 local headerText = headerFrame:CreateFontString(nil, "OVERLAY")
 headerText:SetFont(V.config.text.font, V.config.text.normalFontSize)
-headerText:SetTextColor(onfig.text.header.color)
+headerText:SetTextColor(unpack(V.config.text.header.color))
 headerText:SetJustifyH("CENTER")
 headerText:SetPoint("LEFT", headerFrame, "LEFT", 6, 0)
 headerText:SetText("social")

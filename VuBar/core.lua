@@ -13,6 +13,7 @@ local unpack = unpack
 -- V.configuration
 ----------------------------------
 --V.config.media = "Interface\\AddOns\\"..addon.."\\media\\"
+V.config = {}
 V.config.player = UnitName("player")
 V.config.class = select(2, UnitClass("player"))
 V.config.realm = GetRealmName()
@@ -23,7 +24,7 @@ V.config.media = {
 }
 -- Text Defaults
 V.config.text = {
-    font = V.config.media.."homizio_bold.ttf",
+    font = V.config.media.path.."homizio_bold.ttf",
     normalFontSize = 12,
     bigFontSize = 20,
     header = {
@@ -32,10 +33,10 @@ V.config.text = {
 }
 -- Core Frame Defaults
 V.config.frame = {
-    width = 140,
+    width = 160,
     height = GetScreenHeight(),
     strata = "BACKGROUND",
-    background = { 0, 0, 0, .35}
+    background = { 0, 0, 0, .35 },
     left = true,
     right = true,
 }
@@ -160,6 +161,7 @@ end
 ----------------------------------
 -- Spawn Frames
 ----------------------------------
+V.frames = {}
 if V.config.frame.left then
     lframe = SpawnFrame("Left")
     lframe:Show()
