@@ -35,7 +35,8 @@ restingText:SetTextColor(.6,.6,.6)
 
 local afkText = clockFrame:CreateFontString(nil, "OVERLAY")
 afkText:SetFont(V.config.text.font, V.config.text.normalFontSize)
-afkText:SetPoint("TOPLEFT", 51, -30)
+afkText:SetPoint("CENTER", -8, 16)
+afkText:SetJustifyH("RIGHT")
 afkText:SetTextColor(.6,.6,.6)
 
 local elapsed = 0

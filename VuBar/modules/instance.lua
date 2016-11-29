@@ -52,16 +52,39 @@ end
 -- Instance Frame
 ----------------------------------
 local instanceFrame = CreateFrame("FRAME","$parentInstance", V.frames.left)
-instanceFrame:SetPoint("TOP",0,-294)
-instanceFrame:SetSize(V.config.frame.width, 20)
-if V.config.debug then
+--instanceFrame:SetPoint("TOP",0,-494)
+instanceFrame:SetPoint("TOP", -160, -494)
+instanceFrame:SetSize(V.config.frame.width, 100)
+if V.debug then
      instanceFrame:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
      instanceFrame:SetBackdropColor(0, 0, 0, 0.2)
 end
 
-local instanceTypeFrame = CreateFrame("FRAME", nil, instanceFrame)
-instanceTypeFrame:SetSize(V.config.frame.width, 100)
-instanceTypeFrame:SetPoint("TOP")
+--slideIn
+local ag1 = instanceFrame:CreateAnimationGroup()
+ag1:SetScript("onFinished", function()
+    instanceFrame:SetPoint("TOP",0,-494)
+end)
+local slideIn = ag1:CreateAnimation("Translation")
+slideIn:SetOffset(160, 0)
+slideIn:SetDuration(.8)
+slideIn:SetStartDelay(.4)
+slideIn:SetSmoothing("OUT")
+
+--slideOut
+local ag2 = instanceFrame:CreateAnimationGroup()
+ag2:SetScript("onFinished", function()
+    instanceFrame:SetPoint("TOP", -160, -494)
+end)
+local slideOut = ag2:CreateAnimation("Translation")
+slideOut:SetOffset(160, 0)
+slideOut:SetDuration(.8)
+--slideOut:SetStartDelay(.4)
+slideOut:SetSmoothing("OUT")
+
+-- local instanceTypeFrame = CreateFrame("FRAME", nil, instanceFrame)
+-- instanceTypeFrame:SetSize(V.config.frame.width, 100)
+-- instanceTypeFrame:SetPoint("TOP")
 
 -- instanceFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 -- instanceFrame:RegisterEvent("EJ_DIFFICULTY_UPDATE") -- Change of Difficulty
@@ -77,11 +100,39 @@ instanceTypeFrame:SetPoint("TOP")
 local instanceTypeFrame = CreateFrame("FRAME", nil, instanceFrame)
 instanceTypeFrame:SetSize(V.config.frame.width, 100)
 instanceTypeFrame:SetPoint("CENTER")
-instanceTypeFrame:SetTexture("Interface\\AchievementFrame\\UI-Achievement-Shields-NoPoints")
-instanceTypeFrame:SetTextCoords(0, .5, 0, .5)
 
+local instanceLockTexture = instanceTypeFrame:CreateTexture()
+instanceLockTexture:SetTexture("Interface\\PETBATTLES\\PetBattle-LockIcon")
+instanceLockTexture:SetPoint("CENTER", -10, -10)
+instanceLockTexture:SetSize(16,16)
 
+local instanceTypeTexture = instanceTypeFrame:CreateTexture()
+instanceTypeTexture:SetTexture("Interface\\AchievementFrame\\UI-Achievement-Shield-Desaturated")
+instanceTypeTexture:SetPoint("CENTER")
+instanceTypeTexture:SetSize(128,128)
 
+local instanceName = instanceTypeFrame:CreateFontString(nil, "OVERLAY")
+instanceName:SetFont(V.config.text.font, V.config.text.normalFontSize)
+instanceName:SetTextColor(.9,.9,.9)
+instanceName:SetJustifyH("CENTER")
+instanceName:SetPoint("CENTER", instanceTypeFrame, "BOTTOM", 0, 10)
+instanceName:SetText("instance name")
+
+local instanceDiffText = instanceTypeFrame:CreateFontString(nil, "OVERLAY")
+instanceDiffText:SetFont(V.config.text.font, V.config.text.normalFontSize)
+instanceDiffText:SetTextColor(.9,.9,.9)
+instanceDiffText:SetJustifyH("CENTER")
+instanceDiffText:SetPoint("CENTER", instanceTypeFrame, "CENTER", 0, 0)
+instanceDiffText:SetText("X")
+
+instanceFrame:RegisterEvent("PLAYER_UPDATE_RESTING")
+instanceFrame:SetScript("onEvent", function(self, event, arg1, arg2, arg3, ...)
+    if IsResting() then
+        ag2:Play()
+    else
+        ag1:Play()
+    end
+end)
 
 --[[
 Media:

@@ -27,9 +27,12 @@ modules\group.lua
 modules\instance.lua
 # modules\farm.lua
 
+# Unit Frames
+unitframes\unitframes.lua
+
 
 # TEST
-modules/_move.lua
+modules\_move.lua
 
 # Inspiration: SX_Databars, XIV, Some UI Sidebar, Ponies.
 # Deprecating/ Combined

@@ -69,6 +69,7 @@ V.config.modules = {
 }
 
 -- debug functions
+V.debug = true
 V.config.debug = true
 
 ---------------------------------------------
@@ -117,8 +118,21 @@ end
 ----------------------------------
 -- Functions
 ----------------------------------
-local function SpawnFrame(side)
-    local VuBarCore = CreateFrame("Frame","VuBarCore"..side, UIParent)   
+local function readableNumbers(value)
+    local mult = 10^1
+    if value > 10000000 then
+        value = floor((value/1000000) * mult + 0.5) / mult
+        value = value .. "m"
+    elseif value > 1000 then
+        value = floor((value/1000) * mult + 0.5) / mult
+        value = value .. "k"
+    end
+    return value
+end
+V.readableNumbers = readableNumbers
+
+local function SpawnSidebar(side)
+    local VuBarCore = CreateFrame("Frame","VuBarSide"..side, UIParent)   
     VuBarCore:SetSize(V.config.frame.width, V.config.frame.height)
     VuBarCore:SetFrameStrata(V.config.frame.strata)
     VuBarCore:SetPoint(string.upper(side))
@@ -163,12 +177,12 @@ end
 ----------------------------------
 V.frames = {}
 if V.config.frame.left then
-    lframe = SpawnFrame("Left")
+    lframe = SpawnSidebar("Left")
     lframe:Show()
     V.frames.left = lframe
 end
 if V.config.frame.right then
-    rframe = SpawnFrame("Right")
+    rframe = SpawnSidebar("Right")
     rframe:Show()
     V.frames.right = rframe
 end
