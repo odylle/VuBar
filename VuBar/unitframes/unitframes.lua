@@ -1,4 +1,4 @@
-local name, addon = ...
+local addon, ns = ...
 local V = ns.V
 
 local unpack, select = unpack, select
@@ -23,26 +23,27 @@ PLAYER: Right Mouse Menu, Left = Target
 -- ChatFrame1:AddMessage(class, color.r, color.g, color.b)
 
 V.unitframes = {
-    bgColor = {0, 0, 0, .6},
+    bgColor = {0, 0, 0, .7},
     normalFontSize = 12,
     largeFontSize = 20,
-    width = 160,
+    xlargeFontSize = 24,
+    width = 180,
     height = 36,
     strata = "LOW",
     player = {
         color = RAID_CLASS_COLORS[select(2, UnitClass("player"))],
         anchor = "BOTTOM",
-        oX = -100,
+        oX = -180,
         oY = 240,
     },
     target = {
         color = RAID_CLASS_COLORS[select(2, UnitClass("target"))],
         anchor = "BOTTOM",
-        oX = 100,
+        oX = 180,
         oY = 240,    
     },
     party = {
-        width = 160-2,
+        width = 180-2,
         height = 36,
         padding = 10,
         anchor = "LEFT",
@@ -54,7 +55,7 @@ if V.debug then
         player = {"Odylle", "WARRIOR", "DAMAGER"},
         pet = {"Imwithstupid"},
         target = {"Iheartu", "PALADIN", "DAMAGER"},
-        tot = {"Suntzu", "MONK"}
+        tot = {"Suntzu", "MONK"},
         party1 = {"Kindofdead", "DEATHKNIGHT", "TANK"},
         party2 = {"Pewpewlazorz", "MAGE", "DAMAGER"},
         party3 = {"Stickfigure", "DRUID", "HEALER"},
@@ -66,30 +67,36 @@ local function SpawnUF(unit)
     local UF = CreateFrame("Frame","VubarUF"..unit, UIParent)   
     UF:SetSize(V.unitframes.width, V.unitframes.height)
     UF:SetFrameStrata(V.unitframes.strata)
+    UF:SetFrameLevel(1)
     UF:SetPoint(V.unitframes[unit].anchor, V.unitframes[unit].oX, V.unitframes[unit].oY)
-    UF:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
-    UF:SetBackdropColor(unpack(V.unitframes.bgColor))
+    --UF:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
+    --UF:SetBackdropColor(unpack(V.unitframes.bgColor))
+    --UF:SetBackdropColor(0,0,0)
 
     ----------------------------------
     -- Health
     ----------------------------------    
-    local HP = CreateFrame("FRAME", "$parentHP", UF)
+    local HP = CreateFrame("FRAME", "$parent.HP", UF)
     HP:SetPoint("TOP",0,-1)
-    HP:SetSize(V.unitframes.width-2, 30-2)
+    HP:SetSize(V.unitframes.width-2, V.unitframes.height-7)
     -- BAR
-    local HPBar = CreateFrame("STATUSBAR", "$parentBar", HP)
-    HPBar:SetSize(V.unitframes.width-2, 30-2)
+    local HPBar = CreateFrame("STATUSBAR", "$parent.Bar", HP)
+    HPBar:SetSize(V.unitframes.width-2, V.unitframes.height-7)
     HPBar:SetPoint("CENTER", 0, 0)
-    HPBar:SetFrameStrata("BACKGROUND")
+    HPBar:SetFrameStrata("LOW")
+    HPBar:SetFrameLevel(2)
+    HPBar:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
+    HPBar:SetBackdropColor(unpack(V.unitframes.bgColor))
     HPBar:SetStatusBarTexture(V.config.media.path..V.config.media.statusbar)
-    HPBar:SetStatusBarColor(V.unitframes[unit].color.r, V.unitframes[unit].color.g, V.unitframes[unit].color.b, .8)
+    HPBar:SetStatusBarColor(V.unitframes[unit].color.r, V.unitframes[unit].color.g, V.unitframes[unit].color.b)
     if unit == "player" then    
         HPBar:SetReverseFill(true)
     end
     UF.HPBar = HPBar
     -- TEXT
-    local HPText = experienceBar:CreateFontString(nil, "OVERLAY")
-    HPText:SetFont(V.config.text.font, V.unitframes.normalFontSize)
+    local HPText = HP:CreateFontString(nil, "OVERLAY")
+    --HPText:SetFrameStrata("LOW")
+    HPText:SetFont(V.config.text.font, V.unitframes.largeFontSize)
     HPText:SetTextColor(.9,.9,.9)
     HPText:SetJustifyH("RIGHT")
     HPText:SetPoint("RIGHT", HP, "RIGHT", -6, 0)
@@ -101,12 +108,13 @@ local function SpawnUF(unit)
     ----------------------------------
     local Power = CreateFrame("FRAME", "$parentPower", UF)
     Power:SetPoint("BOTTOM",0,1)
-    Power:SetSize(V.unitframes.width-2, 7-2)
+    Power:SetSize(V.unitframes.width-2, V.unitframes.height-32)
 
-    local PowerBar = CreateFrame("STATUSBAR", "$parentBar", P)
-    PowerBar:SetSize(V.unitframes.width-2, 7-2)
+    local PowerBar = CreateFrame("STATUSBAR", "$parentBar", Power)
+    PowerBar:SetSize(V.unitframes.width-2, V.unitframes.height-32)
     PowerBar:SetPoint("CENTER", 0, 0)
-    PowerBar:SetFrameStrata("BACKGROUND")
+    PowerBar:SetFrameStrata("LOW")
+    PowerBar:SetFrameLevel(2)
     PowerBar:SetStatusBarTexture(V.config.media.path..V.config.media.statusbar)
     PowerBar:SetStatusBarColor(0, 0.4, 1, .8)
     if unit == "player" then    

@@ -37,9 +37,6 @@ local bars = V.frames.bars
 local frameheight = 0
 if UnitLevel("player") == maxlevel then V.frames.bars.experience = false end
 for i, bar in pairs(bars) do
-    if bar == bars.experience then
-        print("Gevonden")
-    end
     if bar then
         frameheight = frameheight + 20
     end

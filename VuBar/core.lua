@@ -69,8 +69,8 @@ V.config.modules = {
 }
 
 -- debug functions
-V.debug = true
-V.config.debug = true
+V.debug = false
+V.config.debug = false
 
 ---------------------------------------------
 -- SAVED VARIABLES TABLE

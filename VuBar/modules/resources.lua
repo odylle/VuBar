@@ -5,7 +5,7 @@ local unpack = unpack
 -- Resources Frame
 ----------------------------------
 local resourcesFrame = CreateFrame("FRAME","$parentResources", V.frames.left)
-resourcesFrame:SetPoint("TOP",0,-203)
+resourcesFrame:SetPoint("TOP",0,-200)
 resourcesFrame:SetSize(V.config.frame.width, 80)
 if V.config.debug then
      resourcesFrame:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })

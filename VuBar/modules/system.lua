@@ -9,8 +9,8 @@ local V = ns.V
 ----------------------------------
 -- System Frame
 ----------------------------------
-local systemFrame = CreateFrame("BUTTON","$parentSystem", V.frames.left)
-systemFrame:SetPoint("TOP",0,-101)
+local systemFrame = CreateFrame("BUTTON","$parent.System", V.frames.left)
+systemFrame:SetPoint("TOP",0,-100)
 systemFrame:SetSize(V.config.frame.width, 20)
 systemFrame:EnableMouse(true)
 systemFrame:RegisterForClicks("AnyUp")
@@ -18,29 +18,36 @@ if V.debug then
      systemFrame:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
      systemFrame:SetBackdropColor(0, 0, 0, 0.2)
 end
-------------------------
--- TEST LATER ----------
--- local point, relativeTo, relativePoint, xOfs, yOfs = systemFrame:GetPoint(1)
--- local AnimOffSet = GetScreenHeight() + yOfs
-------------------------
+
+local point, relativeTo, relativePoint, xOfs, yOfs = systemFrame:GetPoint(1)
+local AnimOffSet = GetScreenHeight() + yOfs
 
 -- Moving Animation [DOWN]
 local ag1 = systemFrame:CreateAnimationGroup()
 ag1:SetScript("onFinished", function()
-    systemFrame:SetPoint("BOTTOM",0,0)
+    --moveFrame:SetPoint("BOTTOM",V.config.frame.width,100)
+    systemFrame:ClearAllPoints()
+    systemFrame:SetPoint("BOTTOM", 0, 20)
+    --systemFrame:SetPoint("TOP", 0, -1060)
 end)
-local slideDown = ag1:CreateAnimation("Translation")
-slideDown:SetOffset(0,-(GetScreenHeight()-81))
-slideDown:SetDuration(.8)
-slideDown:SetSmoothing("OUT")
+local slideDown1 = ag1:CreateAnimation("Translation")
+slideDown1:SetOffset(0,- ((AnimOffSet-20)/2))
+slideDown1:SetDuration(.55)
+slideDown1:SetSmoothing("OUT")
+-- TEST: Slow first, then fast
+local slideDown2 = ag1:CreateAnimation("Translation")
+slideDown2:SetOffset(0,- ((AnimOffSet-20)/2))
+slideDown2:SetDuration(.25)
+slideDown2:SetSmoothing("OUT")
 
--- Moving Animation [DOWN]
+-- Moving Animation [UP]
 local ag2 = systemFrame:CreateAnimationGroup()
-ag1:SetScript("onFinished", function()
+ag2:SetScript("onFinished", function()
+    systemFrame:ClearAllPoints()
     systemFrame:SetPoint("TOP",0,-101)
 end)
 local slideUp = ag2:CreateAnimation("Translation")
-slideUp:SetOffset(0, GetScreenHeight()-81)
+slideUp:SetOffset(0, AnimOffSet-20)
 slideUp:SetDuration(.8)
 slideUp:SetStartDelay(.4)
 slideUp:SetSmoothing("OUT")
@@ -49,7 +56,7 @@ slideUp:SetSmoothing("OUT")
 ----------------------------------
 -- Latency Frame
 ----------------------------------
-local pingFrame = CreateFrame("FRAME",nil, systemFrame)
+local pingFrame = CreateFrame("FRAME","$parent.Ping", systemFrame)
 
 local pingText = pingFrame:CreateFontString(nil, "OVERLAY")
 pingText:SetFont(V.config.text.font, V.config.text.normalFontSize)
@@ -60,7 +67,7 @@ pingText:SetPoint("LEFT", systemFrame, "LEFT", 6, 0)
 ----------------------------------
 -- FrameRate Frame
 ----------------------------------
-local fpsFrame = CreateFrame("FRAME",nil, systemFrame)
+local fpsFrame = CreateFrame("FRAME","$parent.FPS", systemFrame)
 
 local fpsText = fpsFrame:CreateFontString(nil, "OVERLAY")
 fpsText:SetFont(V.config.text.font, V.config.text.normalFontSize)

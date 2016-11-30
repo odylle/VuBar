@@ -5,7 +5,7 @@ local V = ns.V
 -- Talent Frame
 ----------------------------------
 local talentFrame = CreateFrame("FRAME","$parentTalent", V.frames.left)
-talentFrame:SetPoint("TOP",0,-294)
+talentFrame:SetPoint("TOP",0,-344)
 talentFrame:SetSize(V.config.frame.width, 20)
 if V.debug then
      talentFrame:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
@@ -18,13 +18,13 @@ talentLText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 talentLText:SetTextColor(.6,.6,.6)
 talentLText:SetJustifyH("LEFT")
 talentLText:SetPoint("LEFT", talentFrame, "LEFT", 8, 0)
-talentLText:SetText("Loot Spec")
+talentLText:SetText("loot spec")
 
 local talentRText = talentFrame:CreateFontString(nil, "OVERLAY")
 talentRText:SetFont(V.config.text.font, V.config.text.normalFontSize)
 talentRText:SetJustifyH("RIGHT")
 talentRText:SetPoint("RIGHT", talentFrame, "RIGHT",-6,0)
-talentRText:SetText("Marksmanship")
+talentRText:SetText(string.lower("Marksmanship"))
 
 
 talentFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -39,7 +39,7 @@ talentFrame:SetScript("onEvent", function(self, event, arg1, arg2, arg3, ...)
         talentRText:SetText(currentSpecName)
     else
         _, lootSpecName = GetSpecializationInfoByID(specID)
-        talentRText:SetText(lootSpecName)
+        talentRText:SetText(string.lower(lootSpecName))
     end
 end)
 

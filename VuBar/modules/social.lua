@@ -4,18 +4,48 @@ local unpack = unpack
 ----------------------------------
 -- Social Frame
 ----------------------------------
-local socialFrame = CreateFrame("FRAME","$parentSocial", V.frames.left)
-socialFrame:SetPoint("TOP",0,-132)
+local socialFrame = CreateFrame("FRAME","$parent.Social", V.frames.left)
+socialFrame:SetPoint("TOP",0,-130)
 socialFrame:SetSize(V.config.frame.width, 60)
-if V.config.debug then
+if V.debug then
      socialFrame:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
      socialFrame:SetBackdropColor(0, 0, 0, 0.2)
 end
 
+local ag1 = socialFrame:CreateAnimationGroup()
+ag1:SetScript("onFinished", function()
+	socialFrame:Hide()
+	socialFrame:SetPoint("TOP",-160,-130)
+end)
+local slideLeft = ag1:CreateAnimation("Translation")
+slideLeft:SetOffset(-V.config.frame.width,0)
+slideLeft:SetDuration(.4)
+slideLeft:SetSmoothing("OUT")
+
+local ag1 = socialFrame:CreateAnimationGroup()
+ag1:SetScript("onFinished", function()
+	socialFrame:SetPoint("TOP",0,-130)
+end)
+local slideRight = ag1:CreateAnimation("Translation")
+slideRight:SetOffset(V.config.frame.width,0)
+slideRight:SetDuration(.4)
+slideRight:SetSmoothing("OUT")
+
+socialFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+socialFrame:RegisterEvent("PLAYER_UPDATE_RESTING")
+
+socialFrame:SetScript("onEvent", function(self, event, arg1, arg2, arg3, ...)
+	if IsResting() then
+		ag1:Play()
+	else
+		self.Show()
+		ag2:Play()
+	end
+end)
 ----------------------------------
 -- Header Frame
 ----------------------------------
-local headerFrame = CreateFrame("FRAME","nil", socialFrame)
+local headerFrame = CreateFrame("FRAME","$parent.Header", socialFrame)
 headerFrame:SetSize(V.config.frame.width, 20)
 headerFrame:SetPoint("TOP")
 
@@ -29,7 +59,7 @@ headerText:SetText("social")
 ----------------------------------
 -- Friends Frame
 ----------------------------------
-local friendFrame = CreateFrame("BUTTON",nil, headerFrame)
+local friendFrame = CreateFrame("BUTTON","$parent.Friends", socialFrame)
 friendFrame:SetSize(V.config.frame.width, 20)
 friendFrame:SetPoint("TOP",0,-20)
 -- needs to be clickable for friends pane
@@ -158,7 +188,7 @@ end)
 ----------------------------------
 -- Guild Frame
 ----------------------------------
-local guildFrame = CreateFrame("BUTTON",nil, headerFrame)
+local guildFrame = CreateFrame("BUTTON","$parent.Guild", socialFrame)
 guildFrame:SetSize(V.config.frame.width, 20)
 guildFrame:SetPoint("TOP",0,-40)
 -- needs to be clickable for guilds pane
@@ -230,17 +260,14 @@ end)
 
 local eventframe = CreateFrame("Frame")
 eventframe:RegisterEvent("PLAYER_ENTERING_WORLD")
-
 eventframe:RegisterEvent("FRIENDLIST_UPDATE")
 eventframe:RegisterEvent("BN_FRIEND_ACCOUNT_ONLINE")
 eventframe:RegisterEvent("BN_FRIEND_ACCOUNT_OFFLINE")
-
 eventframe:RegisterEvent("GUILD_ROSTER_UPDATE")
 eventframe:RegisterEvent("GUILD_TRADESKILL_UPDATE")
 eventframe:RegisterEvent("GUILD_MOTD")
 eventframe:RegisterEvent("GUILD_NEWS_UPDATE")
 eventframe:RegisterEvent("PLAYER_GUILD_UPDATE")
-
 eventframe:SetScript("OnEvent", function(self,event, ...)
 	local numOnline = ""
 	if IsInGuild() then

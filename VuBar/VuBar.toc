@@ -1,7 +1,7 @@
 ## Interface: 70100
 ## Title: VuBar
 ## Author: |cff00FA9AOdylle |r
-## Version: 0.2
+## Version: 0.3
 ## Notes: A Vertically usable Bar Addon. Totally inspired by the internet. Written by a total n00b.
 ## SavedVariables: VuBarVars
 ## SavedVariablesPerCharacter: VuBarCharVars
@@ -28,7 +28,7 @@ modules\instance.lua
 # modules\farm.lua
 
 # Unit Frames
-unitframes\unitframes.lua
+#unitframes\unitframes.lua
 
 
 # TEST
