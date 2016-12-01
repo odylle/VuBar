@@ -11,3 +11,4 @@ lib.lua
 
 # Modules
 modules/clock.lua
+modules/armor.lua

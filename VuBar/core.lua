@@ -78,7 +78,7 @@ local config = {
 V.config = config
 
 ----------------------------------
--- Modules Handling
+-- Modules Handling - NEW
 ----------------------------------
 local function IterateModules(modules)
 
@@ -88,7 +88,7 @@ local modules = {}
 V.modules = modules
 
 ----------------------------------
--- Sidebars
+-- Spawn Sidebar Frames
 ----------------------------------
 local function SpawnSidebar(side)
     local frame = CreateFrame("Frame","VuBarSide"..side, UIParent)   
@@ -116,7 +116,6 @@ V.EventHandler = EventHandler
 local EventFrame = CreateFrame("Frame")
 EventFrame:SetScript("OnEvent", EventHandler)
 V.EventFrame = EventFrame
-
 
 ----------------------------------
 -- Events

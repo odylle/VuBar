@@ -37,12 +37,14 @@ local pairs = pairs
 ----------------------------------
 module = {
     name = "Clock",
+    description = "Display Time and Rest Status"
     height = 100, -- Hardcoded height for clock
 }
 
 ----------------------------------
--- Frame Functions
+-- Functions
 ----------------------------------
+
 local function OnEnter(self)
     GameTooltip:SetOwner(self,"ANCHOR_BOTTOMRIGHT",0,0)
 
@@ -117,6 +119,7 @@ local function OnClick(self, button, down)
     end
 end
 
+-- NEEDS CLEANING ----------------
 local function OnUpdate(self, e) 
     elapsed = elapsed + e
     if elapsed >= 1 then
@@ -157,14 +160,10 @@ local function OnUpdate(self, e)
     end
 end
 
-
-
-
 ----------------------------------
 -- Event Handling
 ----------------------------------
 local function EventFrame:PLAYER_ENTERING_WORLD()
-    local text = ""
     if IsResting() then text = "resting" else text = "" end
     restingText:SetText(text)
     if UnitIsAFK("player") then text = "afk" else text = "" end
@@ -187,6 +186,7 @@ local function EventFrame:UPDATE_INSTANCE_INFO()
         OnEnter(self)
     end
 end
+
 -- EVENTS ------------------------
 local events = {
     "PLAYER_ENTERING_WORLD",
@@ -215,8 +215,9 @@ if V.debug then DebugFrame(baseFrame) end
 V.frames.clock = baseFrame
 
 ----------------------------------
--- Content
+-- Content Frame(s)
 ----------------------------------
+
 -- TIME --------------------------
 local timeText = baseFrame:CreateFontString(nil, "OVERLAY")
 timeText:SetPoint("CENTER")
@@ -224,16 +225,19 @@ timeText:SetHeight(module.height)
 timeText:SetFont(V.defaults.text.font.main, V.defaults.text.xlarge)
 timeText:SetTextColor(unpack(V.defaults.text.color.bright))
 timeText:SetAllPoints()
+
 -- CALENDAR ----------------------
 local calendarText = clockFrame:CreateFontString(nil, "OVERLAY")
 calendarText:SetFont(V.defaults.text.font.main, V.defaults.text.normal)
 calendarText:SetPoint("TOP", baseFrame, "TOP", 0, -18)
 calendarText:SetTextColor(unpack(V.defaults.text.color.dim))
+
 -- RESTING -----------------------
 local restingText = baseFrame:CreateFontString(nil, "OVERLAY")
 restingText:SetFont(V.defaults.text.font, V.defaults.text.normal)
 restingText:SetPoint("BOTTOM", 0, 30)
 restingText:SetTextColor(unpack(V.defaults.text.color.dim))
+
 -- AFK ---------------------------
 local afkText = baseFrame:CreateFontString(nil, "OVERLAY")
 afkText:SetFont(V.defaults.text.font.main, V.defaults.text.normal)
