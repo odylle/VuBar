@@ -2,199 +2,149 @@ local addon, ns = ...
 
 local V = {}
 ns.V = V
-
---local V.config.= {}
---ns.V.config.= config
---local frames = {}
---ns.frames = frames
-
-local unpack = unpack
 ----------------------------------
--- V.configuration
+-- SetUp Mode Helper
 ----------------------------------
---V.config.media = "Interface\\AddOns\\"..addon.."\\media\\"
-V.config = {}
-V.config.player = UnitName("player")
-V.config.class = select(2, UnitClass("player"))
-V.config.realm = GetRealmName()
--- Media Defaults
-V.config.media = {
-     path = "Interface\\AddOns\\"..addon.."\\media\\",
-     statusbar = "Flat"
-}
--- Text Defaults
-V.config.text = {
-    font = V.config.media.path.."homizio_bold.ttf",
-    normalFontSize = 12,
-    bigFontSize = 20,
-    header = {
-        color = { .4, .4, .4}
-    },
-}
--- Core Frame Defaults
-V.config.frame = {
-    width = 160,
-    height = GetScreenHeight(),
-    strata = "BACKGROUND",
-    background = { 0, 0, 0, .35 },
-    left = true,
-    right = true,
-}
--- Modules Defaults
-V.config.modules = {
-    clock = {
-        order = 0,
-        side = "Left",
-    },
-    system = {
-        order = 1,
-        side="Left"
-    },
-    social = {
-        order = 2,
-        side = "Left"
-    },
-    resources = {
-        order = 3,
-        side = "Left",
-    },
-    armor = {
-        order = 4,
-        side = "Left",
-    },
-    talent = {
-        order = 5,
-        side = "Left",
-    },
-}
+V.debug = true
 
--- debug functions
-V.debug = false
-V.config.debug = false
+----------------------------------
+-- Blizz Api & Variables
+----------------------------------
+local UnitName = UnitName
+local UnitClass = UnitClass
+local GetRealmName = GetRealmName
+local GetScreenHeight = GetScreenHeight
+-- LUA Functions -----------------
+local select = select
 
----------------------------------------------
--- SAVED VARIABLES TABLE
----------------------------------------------
--- copies missing fields from source table
-function CopyTable(src, dest)
-    if type(dest) ~= "table" then
-        dest = {}
-    end
+----------------------------------
+-- Media & Fonts
+----------------------------------
+local media = {
+    fonts = "Interface\\AddOns\\"..addon.."\\media\\fonts\\",
+    textures = "Interface\\AddOns\\"..addon.."\\media\\textures\\",
+}
+V.media = media
 
-    for k, v in pairs(src) do
-        if type(v) == "table" then
-            dest[k] = CopyTable(v, dest[k])
-        elseif type(v) ~= type(dest[k]) then
-            dest[k] = v
-        end
-    end
+local fonts = {
+    homizio = {
+        bold = media.fonts.."homizio_bold.ttf",
+        black = media.fonts.."homizio_black.ttf",
+        light = media.fonts.."homizio_light.ttf",
+        medium = media.fonts.."homizio_medium.ttf",
+        regular = media.fonts.."homizio_regular.ttf",
+        thin = media.fonts.."homizio_thin.ttf",    
+    }
+}
+----------------------------------
+-- Defaults (Font, Sizes)
+----------------------------------
+local defaults = {
+    text = {
+        font = {
+            main = fonts.homizio.bold,
+            bold = fonts.homizio.black,
+        },
+        small = 11,
+        normal = 12,
+        large = 16,
+        xlarge = 20,
+        color = {
+            bright = { .9, .9, .9},
+            dim = { .6, .6 ,.6},
+            header = { .4, .4, .4}
+    },
+    statusbar = media.textures.."Flat",
+    frame = {
+        width = 160,
+        maxheight = GetScreenHeight(),
+        strata = "BACKGROUND",
+        background = { 0, 0, 0, .35 },
+        anchor = "TOP",
+    }
+}
+V.defaults = defaults
 
-    return dest
+----------------------------------
+-- Config Parameters
+----------------------------------
+local config = {
+    player = {
+        name = Unitname("player"),
+        class = select(2, UnitClass("player")),
+        realm = GetRealmName()
+    }
+}
+V.config = config
+
+----------------------------------
+-- Modules Handling
+----------------------------------
+local function IterateModules(modules)
+
 end
 
--- removes everything that is present in source table from another table
-function DiffTable(src, dest)
-    if type(dest) ~= "table" then
-        return {}
-    end
-
-    if type(src) ~= "table" then
-        return dest
-    end
-
-    for k, v in pairs(dest) do
-        if type(v) == "table" then
-            if not next(DiffTable(src[k], v)) then
-                dest[k] = nil
-            end
-        elseif v == src[k] then
-            dest[k] = nil
-        end
-    end
-
-    return dest
-end
+local modules = {}
+V.modules = modules
 
 ----------------------------------
--- Functions
+-- Sidebars
 ----------------------------------
-local function readableNumbers(value)
-    local mult = 10^1
-    if value > 10000000 then
-        value = floor((value/1000000) * mult + 0.5) / mult
-        value = value .. "m"
-    elseif value > 1000 then
-        value = floor((value/1000) * mult + 0.5) / mult
-        value = value .. "k"
-    end
-    return value
-end
-V.readableNumbers = readableNumbers
-
 local function SpawnSidebar(side)
-    local VuBarCore = CreateFrame("Frame","VuBarSide"..side, UIParent)   
-    VuBarCore:SetSize(V.config.frame.width, V.config.frame.height)
-    VuBarCore:SetFrameStrata(V.config.frame.strata)
-    VuBarCore:SetPoint(string.upper(side))
+    local frame = CreateFrame("Frame","VuBarSide"..side, UIParent)   
+    frame:SetSize(V.defaults.frame.width, V.defaults.frame.height)
+    frame:SetFrameStrata(V.defaults.frame.strata)
+    frame:SetPoint(string.upper(side))
 
-    local background = VuBarCore:CreateTexture(nil,"BACKGROUND",nil,-8)
+    local background = frame:CreateTexture(nil,"BACKGROUND",nil,-8)
     background:SetAllPoints()
-    background:SetColorTexture(unpack(V.config.frame.background))
-    VuBarCore.background = background
+    background:SetColorTexture(unpack(V.defaults.frame.background))
+    frame.background = background
 
-    return VuBarCore
-end
-
-local function EventHandler(self, event, arg)
-    if event == "ADDON_LOADED" and arg == addon then    
-        -- Load Savedvariables
-        -- local VuBarVars = CopyTable(D, VuBarVars)
-        -- if type(VuBarVars) ~= "table" then
-        --     ns.VuBarVars = {}
-        --     ns.VuBarVars[V.config.realm] = {}
-        --     ns.VuBarVars[V.config.realm][V.config.player] = {}
-        -- else            
-        --     ns.VuBarVars = VuBarVars
-        -- end
-    elseif event == "PLAYER_LOGIN" then
-        -- Do something with the SavedVariables
-
-    elseif event == "PLAYER_LOGOUT" then
-
-        -- Save SavedVariables
-        -- VuBarVars = DiffTable(D, ns.VuBarVars)
-    elseif event == "PET_BATTLE_OPENING_START" then
-
-        -- Hide VuBar Frames
-    elseif event == "PET_BATTLE_CLOSE" then
-
-        -- Show VuBar Frames
-    end
+    return frame    
 end
 
 ----------------------------------
--- Spawn Frames
+-- Event Handling - Experimental
 ----------------------------------
-V.frames = {}
-if V.config.frame.left then
-    lframe = SpawnSidebar("Left")
-    lframe:Show()
-    V.frames.left = lframe
+local function EventHandler(self, event, ...)
+    self[event](self, ...)
 end
-if V.config.frame.right then
-    rframe = SpawnSidebar("Right")
-    rframe:Show()
-    V.frames.right = rframe
+V.EventHandler = EventHandler
+-- function EventFrame:{EVENTNAME}()
+
+local EventFrame = CreateFrame("Frame")
+EventFrame:SetScript("OnEvent", EventHandler)
+V.EventFrame = EventFrame
+
+
+----------------------------------
+-- Events
+----------------------------------
+local function EventFrame:ADDON_LOADED(arg)
+    if arg ~= addon then return end
+    -- Load Saved variables
+    
+    self:RegisterEvent("PLAYER_LOGIN")
+    self:RegisterEvent("PLAYER_LOGOUT")
+    self:UnregisterEvent("ADDON_LOADED")    
+end
+
+local function EventFrame:PLAYER_LOGIN()
+    -- Spawn Sidebars
+    left = SpawnSidebar("Left")
+    left:Show()
+    right = SpawnSidebar("Right")
+    right:Show()
+    V.frames = {
+        left = left,
+        right = right
+    }
+end
+
+local function EventFrame:PLAYER_LOGOUT()
+    -- Save Variables
 end
 
 ----------------------------------
--- Event Frame
-----------------------------------
-local eventframe = CreateFrame("Frame",nil, UIParent)
-eventframe:RegisterEvent("ADDON_LOADED")
-eventframe:RegisterEvent("PLAYER_LOGIN")
---eventframe:RegisterEvent("PLAYER_ENTERING_WORLD")
-eventframe:RegisterEvent("PLAYER_LOGOUT")
-eventframe:RegisterEvent("PET_BATTLE_OPENING_START")
-eventframe:RegisterEvent("PET_BATTLE_CLOSE")
-eventframe:SetScript("OnEvent", EventHandler)
+EventFrame:RegisterEvent("ADDON_LOADED")

@@ -1,41 +1,13 @@
 ## Interface: 70100
 ## Title: VuBar
 ## Author: |cff00FA9AOdylle |r
-## Version: 0.3
+## Version: 0.4 - A New Dawn.
 ## Notes: A Vertically usable Bar Addon. Totally inspired by the internet. Written by a total n00b.
 ## SavedVariables: VuBarVars
 ## SavedVariablesPerCharacter: VuBarCharVars
 
 core.lua
+lib.lua
 
-modules\social.lua
-modules\armor.lua
-modules\clock.lua
-modules\system.lua
-# modules\config.lua
-modules\talent.lua
-# modules\tradeskill.lua
-# modules\heartstone.lua
-
-# New
-modules\resources.lua
-modules\minimap.lua
-# modules\details.lua - This one is prestigious and requires more work ;)
-modules\bars.lua
-modules\vehicle.lua
-modules\group.lua
-modules\instance.lua
-# modules\farm.lua
-
-# Unit Frames
-#unitframes\unitframes.lua
-
-
-# TEST
-modules\_move.lua
-
-# Inspiration: SX_Databars, XIV, Some UI Sidebar, Ponies.
-# Deprecating/ Combined
-# modules\gold.lua
-# modules\currency.lua
-# modules\micromenu.lua
+# Modules
+modules/clock.lua
