@@ -11,4 +11,8 @@ lib.lua
 
 # Modules
 modules/clock.lua
-modules/armor.lua
+modules/system.lua
+modules/gear.lua
+modules/social.lua
+modules/resources.lua
+modules/minimap.lua

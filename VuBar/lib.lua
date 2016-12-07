@@ -6,9 +6,16 @@ local V = ns.V
 local EventHandler = V.EventHandler
 local EventFrame = V.EventFrame
 
+-- LUA Functions -----------------
+local _G = _G
+local pairs = pairs
+
+local GameTooltip, GameTooltipStatusBar = _G["GameTooltip"], _G["GameTooltipStatusBar"]
 ----------------------------------
 -- Support Functions
 ----------------------------------
+
+-- Readable Values ---------------
 local function Shorten(value)
     local mult = 10^1
     if value > 10000000 then
@@ -22,8 +29,34 @@ local function Shorten(value)
 end
 V.shorten = shorten
 
-local function DebugFrame(frame)
-    frame:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
-    frame:SetBackdropColor(0, 0, 0, 0.2)
-    return frame
+-- Find Anchoring Point ----------
+local function FindAnchor(side)
+    local anchor = 0
+    for k, m in pairs(V.modules) do
+        anchor = anchor + V.modules.k.height
+    end
+    return anchor
 end
+V.FindAnchor = FindAnchor
+
+
+-- Show Frame Background ---------
+local function DebugFrame(f)
+    f:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
+    f:SetBackdropColor(0, 0, 0, 0.2)
+    return f
+end
+V.DebugFrame = DebugFrame
+
+----------------------------------
+
+-- local function Tooltip(self)
+--     GameTooltipHeaderText:SetFont(V.defaults.text.font.main, 12)
+--     GameTooltipText:SetFont(V.defaults.text.font.main, 11)
+--     GameTooltipTextSmall:SetFont(V.defaults.text.font.main, 9) 
+
+--     -- tt = CreateFrame("GameTooltip", "VuBarTooltip", nil)
+--     -- tt:SetOwner(self,"ANCHOR_BOTTOMRIGHT",0,20)
+--     -- return tt
+-- end
+-- V.Tooltip = Tooltip

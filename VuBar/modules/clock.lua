@@ -35,9 +35,10 @@ local pairs = pairs
 ----------------------------------
 -- Module Config
 ----------------------------------
-module = {
+local module = {
     name = "Clock",
-    description = "Display Time and Rest Status"
+    side = "left",
+    description = "Display Time and Rest Status",
     height = 100, -- Hardcoded height for clock
 }
 
@@ -128,15 +129,15 @@ local function OnUpdate(self, e)
         if m < 10 then m = ("0"..m) end       
         if ( GetCVarBool("timeMgrUseLocalTime") ) then
             if ( GetCVarBool("timeMgrUseMilitaryTime") ) then
-                timeText:SetText(date("%H:%M"))
+                self.timeText:SetText(date("%H:%M"))
                 --amText:SetText("")    
             else
-                timeText:SetText(date("%I:%M"))
+                self.timeText:SetText(date("%I:%M"))
                 --amText:SetText(date("%p"))        
             end         
         else
             if ( GetCVarBool("timeMgrUseMilitaryTime") ) then
-                timeText:SetText(h..":"..m)
+                self.timeText:SetText(h..":"..m)
                 --amText:SetText("")    
             else
                 if h > 12 then 
@@ -145,14 +146,14 @@ local function OnUpdate(self, e)
                 else 
                     --AmPmTimeText = "AM"
                 end
-                timeText:SetText(h..":"..m)
+                self.timeText:SetText(h..":"..m)
                 --amText:SetText(AmPmTimeText)      
             end
         end
         if (CalendarGetNumPendingInvites() > 0) then
-            calendarText:SetText(string.format("%s  (|cffffff00%i|r)", "new events", (CalendarGetNumPendingInvites())))
+            self.calendarText:SetText(string.format("%s  (|cffffff00%i|r)", "new events", (CalendarGetNumPendingInvites())))
         else
-            calendarText:SetText("")
+            self.calendarText:SetText("")
         end
         --baseFrame:SetWidth(clockText:GetStringWidth() + amText:GetStringWidth())
         --baseFrame:SetPoint("CENTER", V.config.lframe)        
@@ -160,28 +161,85 @@ local function OnUpdate(self, e)
     end
 end
 
+
+----------------------------------
+-- Base Frame
+----------------------------------
+local baseFrame = CreateFrame("BUTTON","$parent."..module.name, V.frames.left)
+baseFrame:SetParent(V.frames.left)
+baseFrame:SetPoint(V.defaults.frame.anchor)
+baseFrame:SetSize(V.defaults.frame.width, module.height)
+baseFrame:EnableMouse(true)
+baseFrame:RegisterForClicks("AnyUp")
+baseFrame:SetScript('OnUpdate', OnUpdate)
+baseFrame:SetScript("OnEnter", OnEnter) 
+baseFrame:SetScript("OnLeave", OnLeave)
+baseFrame:SetScript("OnClick", OnClick)
+if V.debug then DebugFrame(baseFrame) end
+
+----------------------------------
+-- Content Frame(s)
+----------------------------------
+
+-- TIME --------------------------
+local timeText = baseFrame:CreateFontString(nil, "OVERLAY")
+timeText:SetPoint("CENTER")
+timeText:SetHeight(module.height)
+timeText:SetFont(V.defaults.text.font.main, V.defaults.text.xlarge)
+timeText:SetTextColor(unpack(V.defaults.text.color.bright))
+timeText:SetAllPoints()
+baseFrame.timeText = timeText
+
+-- CALENDAR ----------------------
+local calendarText = baseFrame:CreateFontString(nil, "OVERLAY")
+calendarText:SetFont(V.defaults.text.font.main, V.defaults.text.normal)
+calendarText:SetPoint("TOP", baseFrame, "TOP", 0, -18)
+calendarText:SetTextColor(unpack(V.defaults.text.color.dim))
+baseFrame.calendarText = calendarText
+
+-- RESTING -----------------------
+local restingText = baseFrame:CreateFontString(nil, "OVERLAY")
+restingText:SetFont(V.defaults.text.font.main, V.defaults.text.normal)
+restingText:SetPoint("BOTTOM", 0, 30)
+restingText:SetTextColor(unpack(V.defaults.text.color.dim))
+if IsResting() then text = "resting" else text = "" end
+restingText:SetText(text)
+baseFrame.restingText = restingText
+
+-- AFK ---------------------------
+local afkText = baseFrame:CreateFontString(nil, "OVERLAY")
+afkText:SetFont(V.defaults.text.font.main, V.defaults.text.normal)
+afkText:SetPoint("CENTER", -8, 16)
+afkText:SetJustifyH("RIGHT")
+afkText:SetTextColor(unpack(V.defaults.text.color.dim))
+baseFrame.afkText = afkText
+
+-- CHEAP MODULE REGISTERING ------
+V.frames.clock = baseFrame
+V.modules.clock = module
+
 ----------------------------------
 -- Event Handling
 ----------------------------------
-local function EventFrame:PLAYER_ENTERING_WORLD()
+function EventFrame:PLAYER_ENTERING_WORLD()
     if IsResting() then text = "resting" else text = "" end
-    restingText:SetText(text)
+    V.frames.clock.restingText:SetText(text)
     if UnitIsAFK("player") then text = "afk" else text = "" end
-    afkText:SetText(text)
+    V.frames.clock.afkText:SetText(text)
 end
 
-local function EventFrame:PLAYER_UPDATE_RESTING()
+function EventFrame:PLAYER_UPDATE_RESTING()
     if IsResting() then text = "resting" else text = "" end
-    restingText:SetText(text)
+    V.frames.clock.restingText:SetText(text)
 end
 
-local function EventFrame:PLAYER_FLAGS_CHANGED(arg1)
+function EventFrame:PLAYER_FLAGS_CHANGED(arg1)
     if arg1 ~= "player" then return end
     if UnitIsAFK("player") then text = "afk" else text = "" end
-    afkText:SetText(text)
+    V.frames.clock.afkText:SetText(text)
 end
 
-local function EventFrame:UPDATE_INSTANCE_INFO()
+function EventFrame:UPDATE_INSTANCE_INFO()
     if hover then
         OnEnter(self)
     end
@@ -198,52 +256,3 @@ local events = {
 for i, e in ipairs(events) do
     if not EventFrame:IsEventRegistered(e) then EventFrame:RegisterEvent(e) end
 end
-
-----------------------------------
--- Base Frame
-----------------------------------
-local baseFrame = CreateFrame("BUTTON","$parent."..module.name, V.frames.left)
-baseFrame:SetPoint(V.defaults.frame.anchor)
-baseFrame:SetSize(V.defaults.frame.width, module.height)
-baseFrame:EnableMouse(true)
-baseFrame:RegisterForClicks("AnyUp")
-baseFrame:SetScript('OnUpdate', OnUpdate)
-baseFrame:SetScript("OnEnter", OnEnter) 
-baseFrame:SetScript("OnLeave", OnLeave)
-baseFrame:SetScript("OnClick", OnClick)
-if V.debug then DebugFrame(baseFrame) end
-V.frames.clock = baseFrame
-
-----------------------------------
--- Content Frame(s)
-----------------------------------
-
--- TIME --------------------------
-local timeText = baseFrame:CreateFontString(nil, "OVERLAY")
-timeText:SetPoint("CENTER")
-timeText:SetHeight(module.height)
-timeText:SetFont(V.defaults.text.font.main, V.defaults.text.xlarge)
-timeText:SetTextColor(unpack(V.defaults.text.color.bright))
-timeText:SetAllPoints()
-
--- CALENDAR ----------------------
-local calendarText = clockFrame:CreateFontString(nil, "OVERLAY")
-calendarText:SetFont(V.defaults.text.font.main, V.defaults.text.normal)
-calendarText:SetPoint("TOP", baseFrame, "TOP", 0, -18)
-calendarText:SetTextColor(unpack(V.defaults.text.color.dim))
-
--- RESTING -----------------------
-local restingText = baseFrame:CreateFontString(nil, "OVERLAY")
-restingText:SetFont(V.defaults.text.font, V.defaults.text.normal)
-restingText:SetPoint("BOTTOM", 0, 30)
-restingText:SetTextColor(unpack(V.defaults.text.color.dim))
-
--- AFK ---------------------------
-local afkText = baseFrame:CreateFontString(nil, "OVERLAY")
-afkText:SetFont(V.defaults.text.font.main, V.defaults.text.normal)
-afkText:SetPoint("CENTER", -8, 16)
-afkText:SetJustifyH("RIGHT")
-afkText:SetTextColor(unpack(V.defaults.text.color.dim))
-
--- CHEAP MODULE REGISTERING ------
-V.modules.clock = module

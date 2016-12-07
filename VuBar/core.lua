@@ -5,7 +5,7 @@ ns.V = V
 ----------------------------------
 -- SetUp Mode Helper
 ----------------------------------
-V.debug = true
+V.debug = false
 
 ----------------------------------
 -- Blizz Api & Variables
@@ -40,28 +40,29 @@ local fonts = {
 -- Defaults (Font, Sizes)
 ----------------------------------
 local defaults = {
-    text = {
-        font = {
-            main = fonts.homizio.bold,
-            bold = fonts.homizio.black,
-        },
-        small = 11,
-        normal = 12,
-        large = 16,
-        xlarge = 20,
-        color = {
-            bright = { .9, .9, .9},
-            dim = { .6, .6 ,.6},
-            header = { .4, .4, .4}
-    },
-    statusbar = media.textures.."Flat",
-    frame = {
-        width = 160,
-        maxheight = GetScreenHeight(),
-        strata = "BACKGROUND",
-        background = { 0, 0, 0, .35 },
-        anchor = "TOP",
-    }
+	text = {
+		font = {
+			main = fonts.homizio.bold,
+			bold = fonts.homizio.black,
+		},
+		small = 11,
+		normal = 12,
+		large = 16,
+		xlarge = 20,
+		color = {
+			bright = {.9, .9, .9},
+			dim = {.6, .6 ,.6},
+			header = {.4, .4, .4},
+		},
+	},
+	statusbar = media.textures.."Flat",
+	frame = {
+		width = 160,		
+		height = GetScreenHeight(),
+		strata = "BACKGROUND",
+		background = {0, 0, 0, .35 },
+		anchor = "TOP",
+	},
 }
 V.defaults = defaults
 
@@ -70,7 +71,7 @@ V.defaults = defaults
 ----------------------------------
 local config = {
     player = {
-        name = Unitname("player"),
+        name = UnitName("player"),
         class = select(2, UnitClass("player")),
         realm = GetRealmName()
     }
@@ -90,19 +91,27 @@ V.modules = modules
 ----------------------------------
 -- Spawn Sidebar Frames
 ----------------------------------
+V.frames= {}
 local function SpawnSidebar(side)
-    local frame = CreateFrame("Frame","VuBarSide"..side, UIParent)   
-    frame:SetSize(V.defaults.frame.width, V.defaults.frame.height)
-    frame:SetFrameStrata(V.defaults.frame.strata)
-    frame:SetPoint(string.upper(side))
+    local f = CreateFrame("Frame","VuBarSide"..side, UIParent)   
+    f:SetSize(V.defaults.frame.width, V.defaults.frame.height)
+    f:SetFrameStrata(V.defaults.frame.strata)
+    f:SetPoint(string.upper(side))
 
-    local background = frame:CreateTexture(nil,"BACKGROUND",nil,-8)
+    local background = f:CreateTexture(nil,"BACKGROUND",nil,-8)
     background:SetAllPoints()
     background:SetColorTexture(unpack(V.defaults.frame.background))
-    frame.background = background
-
-    return frame    
+    f.background = background
+    return f    
 end
+
+-- Spawn Sidebars
+left = SpawnSidebar("Left")
+left:Show()
+V.frames.left = left
+right = SpawnSidebar("Right")
+right:Show()
+V.frames.right = right
 
 ----------------------------------
 -- Event Handling - Experimental
@@ -120,7 +129,7 @@ V.EventFrame = EventFrame
 ----------------------------------
 -- Events
 ----------------------------------
-local function EventFrame:ADDON_LOADED(arg)
+function EventFrame:ADDON_LOADED(arg)
     if arg ~= addon then return end
     -- Load Saved variables
     
@@ -129,19 +138,11 @@ local function EventFrame:ADDON_LOADED(arg)
     self:UnregisterEvent("ADDON_LOADED")    
 end
 
-local function EventFrame:PLAYER_LOGIN()
-    -- Spawn Sidebars
-    left = SpawnSidebar("Left")
-    left:Show()
-    right = SpawnSidebar("Right")
-    right:Show()
-    V.frames = {
-        left = left,
-        right = right
-    }
+function EventFrame:PLAYER_LOGIN()
+
 end
 
-local function EventFrame:PLAYER_LOGOUT()
+function EventFrame:PLAYER_LOGOUT()
     -- Save Variables
 end
 
