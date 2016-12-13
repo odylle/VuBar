@@ -18,7 +18,7 @@ local GameTooltip, GameTooltipStatusBar = _G["GameTooltip"], _G["GameTooltipStat
 -- Readable Values ---------------
 local function Shorten(value)
     local mult = 10^1
-    if value > 10000000 then
+    if value > 1000000 then
         value = floor((value/1000000) * mult + 0.5) / mult
         value = value .. "m"
     elseif value > 1000 then
@@ -27,7 +27,7 @@ local function Shorten(value)
     end
     return value
 end
-V.shorten = shorten
+V.Shorten = Shorten
 
 -- Find Anchoring Point ----------
 local function FindAnchor(side)
@@ -48,15 +48,12 @@ local function DebugFrame(f)
 end
 V.DebugFrame = DebugFrame
 
-----------------------------------
-
--- local function Tooltip(self)
---     GameTooltipHeaderText:SetFont(V.defaults.text.font.main, 12)
---     GameTooltipText:SetFont(V.defaults.text.font.main, 11)
---     GameTooltipTextSmall:SetFont(V.defaults.text.font.main, 9) 
-
---     -- tt = CreateFrame("GameTooltip", "VuBarTooltip", nil)
---     -- tt:SetOwner(self,"ANCHOR_BOTTOMRIGHT",0,20)
---     -- return tt
--- end
--- V.Tooltip = Tooltip
+-- Tooltip -----------------------
+local function Tooltip(self)
+    local tt = CreateFrame("GameTooltip", "vTooltip", UIParent, GameTooltipTemplate)
+    tt.GameTooltipHeaderText:SetFont(V.defaults.text.font.main, 12)
+    -- GameTooltipText:SetFont(V.defaults.text.font.main, 11)
+    -- GameTooltipTextSmall:SetFont(V.defaults.text.font.main, 9)
+    return tt
+end
+V.Tooltip = Tooltip

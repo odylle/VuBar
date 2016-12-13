@@ -1,13 +1,14 @@
 ## Interface: 70100
 ## Title: VuBar
 ## Author: |cff00FA9AOdylle |r
-## Version: 0.4 - A New Dawn.
+## Version: 0.5 - A Newer Dawn.
 ## Notes: A Vertically usable Bar Addon. Totally inspired by the internet. Written by a total n00b.
 ## SavedVariables: VuBarVars
 ## SavedVariablesPerCharacter: VuBarCharVars
 
 core.lua
 lib.lua
+# chat.lua
 
 # Modules
 modules/clock.lua
@@ -15,4 +16,7 @@ modules/system.lua
 modules/gear.lua
 modules/social.lua
 modules/resources.lua
+modules/group.lua
 modules/minimap.lua
+modules/bars.lua
+modules/details.lua

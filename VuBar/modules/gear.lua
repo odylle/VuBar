@@ -11,6 +11,10 @@ local elapsed = 0
 ----------------------------------
 local GetInventoryItemDurability = GetInventoryItemDurability
 local GetAverageItemLevel = GetAverageItemLevel
+local GetLootSpecialization = GetLootSpecialization
+local GetSpecialization = GetSpecialization
+local GetSpecializationInfo = GetSpecializationInfo
+local GetSpecializationInfoByID = GetSpecializationInfoByID
 
 -- LUA Functions -----------------
 local min = min
@@ -51,6 +55,18 @@ local function OnUpdate(self, e)
     end
 end
 
+local function LootSpec()
+    local specID = GetLootSpecialization()
+    if specID == 0 then
+        local currentSpec = GetSpecialization()
+        local _, currentSpecName = GetSpecializationInfo(currentSpec)
+        return currentSpecName
+    else
+        _, lootSpecName = GetSpecializationInfoByID(specID)
+        return string.lower(lootSpecName)
+    end
+end
+
 ----------------------------------
 -- Base Frame
 ----------------------------------
@@ -67,12 +83,13 @@ if V.debug then DebugFrame(baseFrame) end
 
 -- ILEVEL ------------------------
 local iLevelFrame = CreateFrame("FRAME", "$parent.iLevel", baseFrame)
-iLevelFrame:SetSize(V.defaults.frame.width, 20)
+iLevelFrame:SetSize(V.defaults.frame.width, 16)
 iLevelFrame:SetPoint("TOP", 0, -(0+module.padding))
+module.height = module.height + iLevelFrame:GetHeight()
 
 local iLevelLText = iLevelFrame:CreateFontString(nil, "OVERLAY")
 iLevelLText:SetFont(V.defaults.text.font.main, V.defaults.text.normal)
-iLevelLText:SetTextColor(unpack(V.defaults.text.color.header))
+iLevelLText:SetTextColor(unpack(V.defaults.text.color.dim))
 iLevelLText:SetJustifyH("LEFT")
 iLevelLText:SetPoint("LEFT", iLevelFrame, "LEFT", 8, 0)
 iLevelLText:SetText("ilevel")
@@ -86,12 +103,13 @@ baseFrame.iLevelText = iLevelRText
 
 -- DURABILITY --------------------
 local durabilityFrame = CreateFrame("FRAME", "$parent.Durability", baseFrame)
-durabilityFrame:SetSize(V.defaults.frame.width, 20)
-durabilityFrame:SetPoint("TOP", 0 , -(20+module.padding))
+durabilityFrame:SetSize(V.defaults.frame.width, 16)
+durabilityFrame:SetPoint("TOP", 0 , -(16+module.padding))
+module.height = module.height + durabilityFrame:GetHeight()
 
 local durabilityLText = durabilityFrame:CreateFontString(nil, "OVERLAY")
 durabilityLText:SetFont(V.defaults.text.font.main, V.defaults.text.normal)
-durabilityLText:SetTextColor(unpack(V.defaults.text.color.header))
+durabilityLText:SetTextColor(unpack(V.defaults.text.color.dim))
 durabilityLText:SetJustifyH("LEFT")
 durabilityLText:SetPoint("LEFT", durabilityFrame, "LEFT", 8, 0)
 durabilityLText:SetText("durability")
@@ -103,9 +121,29 @@ durabilityRText:SetJustifyH("RIGHT")
 durabilityRText:SetPoint("RIGHT", durabilityFrame, "RIGHT",-6,0)
 baseFrame.durabilityText = durabilityRText
 
+-- Loot Specialisation -----------
+local lootspecFrame = CreateFrame("FRAME", "$parent.LootSpec", baseFrame)
+lootspecFrame:SetSize(V.defaults.frame.width, 16)
+lootspecFrame:SetPoint("TOP", 0 , -(32+module.padding))
+module.height = module.height + lootspecFrame:GetHeight()
+
+local lootspecLText = lootspecFrame:CreateFontString(nil, "OVERLAY")
+lootspecLText:SetFont(V.defaults.text.font.main, V.defaults.text.normal)
+lootspecLText:SetTextColor(unpack(V.defaults.text.color.dim))
+lootspecLText:SetJustifyH("LEFT")
+lootspecLText:SetPoint("LEFT", lootspecFrame, "LEFT", 8, 0)
+lootspecLText:SetText("loot specialisation")
+
+local lootspecRText = lootspecFrame:CreateFontString(nil, "OVERLAY")
+lootspecRText:SetFont(V.defaults.text.font.main, V.defaults.text.normal)
+lootspecRText:SetTextColor(unpack(V.defaults.text.color.bright))
+lootspecRText:SetJustifyH("RIGHT")
+lootspecRText:SetPoint("RIGHT", lootspecFrame, "RIGHT",-6,0)
+baseFrame.lootspecText = lootspecRText
+
 
 -- Recalc. baseFrame height ------
-module.height = module.height+iLevelFrame:GetHeight()+durabilityFrame:GetHeight()+module.padding
+module.height = module.height+module.padding
 baseFrame:SetHeight(module.height)
 
 -- CHEAP MODULE REGISTERING ------
@@ -115,18 +153,37 @@ V.modules.gear = module
 ----------------------------------
 -- Event Handling
 ----------------------------------
+local EventFrame = CreateFrame("Frame")
+EventFrame:SetScript("OnEvent", V.EventHandler)
+
 function EventFrame:PLAYER_ENTERING_WORLD()
     V.frames.gear.durabilityText:SetText(Durability().."%")
+    V.frames.gear.lootspecText:SetText(LootSpec())
 end
 
 function EventFrame:UPDATE_INVENTORY_DURABILITY()
     V.frames.gear.durabilityText:SetText(Durability().."%")
 end
 
+function EventFrame:ACTIVE_TALENT_GROUP_CHANGED()
+    V.frames.gear.lootspecText:SetText(LootSpec())
+end
+
+function EventFrame:PLAYER_SPECIALIZATION_CHANGED()
+    V.frames.gear.lootspecText:SetText(LootSpec())
+end
+
+function EventFrame:PLAYER_LOOT_SPEC_UPDATED()
+    V.frames.gear.lootspecText:SetText(LootSpec())
+end
+
 -- EVENTS ------------------------
 local events = {
     "PLAYER_ENTERING_WORLD",
     "UPDATE_INVENTORY_DURABILITY",
+    "ACTIVE_TALENT_GROUP_CHANGED",
+    "PLAYER_SPECIALIZATION_CHANGED",
+    "PLAYER_LOOT_SPEC_UPDATED"
 }
 -- REGISTER IF NOT REGISTERED ----
 for i, e in ipairs(events) do

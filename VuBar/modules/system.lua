@@ -60,11 +60,11 @@ local function OnEnter(self)
     --         print(texture)
     --     end
     -- end
-    print(GameTooltip.TextLeft1:GetText())
-    GameTooltip:AddLine(module.name)
-    GameTooltip:AddDoubleLine("links", "rechts")
-    GameTooltip:AddDoubleLine("links", "rechts")
-    GameTooltip:Show()
+    -- print(GameTooltip.TextLeft1:GetText())
+    -- GameTooltip:AddLine(module.name)
+    -- GameTooltip:AddDoubleLine("links", "rechts")
+    -- GameTooltip:AddDoubleLine("links", "rechts")
+    -- GameTooltip:Show()
 
 end
 

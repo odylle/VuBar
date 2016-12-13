@@ -31,7 +31,7 @@ local module = {
     name = "Resources",
     description = "Display gold and other resources",
     height = 0,
-    padding = 0,
+    padding = 5,
     currency1 = currencies.ORDER_RESOURCES,
     currency2 = currencies.SEAL_OF_BROKEN_FATE,
 }
@@ -39,9 +39,9 @@ local module = {
 ----------------------------------
 -- Functions
 ----------------------------------
-local function goldText()
+local function goldValue()
     local gold = GetMoney()
-    local gold = abs(gold/10000)
+    gold = abs(gold/10000)
     if gold > 1 then
         gold = string.format("|cffffd700%d|cffffffffg|r ", floor(gold))
     else
@@ -55,9 +55,8 @@ end
 ----------------------------------
 local baseFrame = CreateFrame("FRAME","$parent."..module.name, V.frames.left)
 baseFrame:SetParent(V.frames.left)
-baseFrame:SetPoint(V.defaults.frame.anchor,0,-195)
+baseFrame:SetPoint(V.defaults.frame.anchor,0,-(205+module.padding))
 baseFrame:SetSize(V.defaults.frame.width, module.height)
-
 if V.debug then DebugFrame(baseFrame) end
 
 ----------------------------------
@@ -66,10 +65,11 @@ if V.debug then DebugFrame(baseFrame) end
 
 -- Gold --------------------------
 local goldFrame = CreateFrame("FRAME","$parent.Gold", baseFrame)
-goldFrame:SetSize(V.defaults.frame.width, 20)
-goldFrame:SetPoint("TOP")
+goldFrame:SetSize(V.defaults.frame.width, 30)
+goldFrame:SetPoint("TOP", 0, -(module.padding))
+module.height = module.height + goldFrame:GetHeight()
 
-local goldText = goldFrame:CreateFontString(nil. "OVERLAY")
+local goldText = goldFrame:CreateFontString(nil, "OVERLAY")
 goldText:SetFont(V.defaults.text.font.main, V.defaults.text.large)
 goldText:SetTextColor(unpack(V.defaults.text.color.bright))
 goldText:SetJustifyH("TOP")
@@ -79,11 +79,12 @@ baseFrame.goldText = goldText
 -- Currency #1 -------------------
 local currency1Frame = CreateFrame("FRAME","$parent.Currency1", baseFrame)
 currency1Frame:SetSize(V.defaults.frame.width, 20)
-currency1Frame:SetPoint("TOP",0,-20)
+currency1Frame:SetPoint("TOP",0,- (30+module.padding))
+module.height = module.height + currency1Frame:GetHeight()
 
 local currency1LText = currency1Frame:CreateFontString(nil, "OVERLAY")
 currency1LText:SetFont(V.defaults.text.font.main, V.defaults.text.normal)
-currency1LText:SetTextColor(unpack(V.defaults.text.color.header))
+currency1LText:SetTextColor(unpack(V.defaults.text.color.dim))
 currency1LText:SetJustifyH("LEFT")
 currency1LText:SetPoint("LEFT", currency1Frame, "LEFT", 8, 0)
 currency1LText:SetText("currency1")
@@ -99,11 +100,12 @@ baseFrame.currency1Text = currency1RText
 -- Currency #2 -------------------
 local currency2Frame = CreateFrame("FRAME","$parent.Currency2", baseFrame)
 currency2Frame:SetSize(V.defaults.frame.width, 20)
-currency2Frame:SetPoint("TOP",0,-40)
+currency2Frame:SetPoint("TOP",0,- (50+module.padding))
+module.height = module.height + currency2Frame:GetHeight()
 
 local currency2LText = currency2Frame:CreateFontString(nil, "OVERLAY")
 currency2LText:SetFont(V.defaults.text.font.main, V.defaults.text.normal)
-currency2LText:SetTextColor(unpack(V.defaults.text.color.header))
+currency2LText:SetTextColor(unpack(V.defaults.text.color.dim))
 currency2LText:SetJustifyH("LEFT")
 currency2LText:SetPoint("LEFT", currency2Frame, "LEFT", 8, 0)
 currency2LText:SetText("currency2")
@@ -117,7 +119,7 @@ currency2RText:SetPoint("RIGHT", currency2Frame, "RIGHT",-6,0)
 baseFrame.currency2Text = currency2RText
 
 -- Recalc. baseFrame height ------
-module.height = module.height+goldFrame:GetHeight()+currency1Frame:GetHeight()+currency2Frame:GetHeight()+module.padding
+module.height = module.height+module.padding
 baseFrame:SetHeight(module.height)
 
 -- CHEAP MODULE REGISTERING ------
@@ -127,8 +129,13 @@ V.modules.resources = module
 ----------------------------------
 -- Event Handling
 ----------------------------------
+local EventFrame = CreateFrame("Frame")
+EventFrame:SetScript("OnEvent", V.EventHandler)
+
 function EventFrame:PLAYER_ENTERING_WORLD()
-    V.frames.resources.goldText:SetText(goldText())
+    g = goldValue()
+    if not ns.playerData["gold"] then ns.playerData["gold"] = g end
+    V.frames.resources.goldText:SetText(g)
     -- First Currency:
     name, currentAmount, _, earnedThisWeek, weeklyMax, totalMax = GetCurrencyInfo(module.currency1)
     V.frames.resources.currency1Name:SetText(string.lower(name))
@@ -139,10 +146,25 @@ function EventFrame:PLAYER_ENTERING_WORLD()
     V.frames.resources.currency2Text:SetText(currentAmount)
 end
 
+function EventFrame:PLAYER_MONEY()
+    V.frames.resources.goldText:SetText(goldValue())
+end
+
+function EventFrame:CURRENCY_DISPLAY_UPDATE()
+    name, currentAmount, _, earnedThisWeek, weeklyMax, totalMax = GetCurrencyInfo(module.currency1)
+    V.frames.resources.currency1Name:SetText(string.lower(name))
+    V.frames.resources.currency1Text:SetText(currentAmount)
+    -- Second Currency:
+    name, currentAmount, _, earnedThisWeek, weeklyMax, totalMax = GetCurrencyInfo(module.currency2)
+    V.frames.resources.currency2Name:SetText(string.lower(name))
+    V.frames.resources.currency2Text:SetText(currentAmount)
+end
 
 -- EVENTS ------------------------
 local events = {
     "PLAYER_ENTERING_WORLD",
+    "CURRENCY_DISPLAY_UPDATE",
+    "PLAYER_MONEY"
 }
 -- REGISTER IF NOT REGISTERED ----
 for i, e in ipairs(events) do
