@@ -50,10 +50,10 @@ V.DebugFrame = DebugFrame
 
 -- Tooltip -----------------------
 local function Tooltip(self)
-    local tt = CreateFrame("GameTooltip", "vTooltip", UIParent, GameTooltipTemplate)
-    tt.GameTooltipHeaderText:SetFont(V.defaults.text.font.main, 12)
-    -- GameTooltipText:SetFont(V.defaults.text.font.main, 11)
-    -- GameTooltipTextSmall:SetFont(V.defaults.text.font.main, 9)
+    local tt = CreateFrame("GameTooltip", "vTooltip", self, "GameTooltipTemplate")
+    GameTooltipHeaderText:SetFont(V.defaults.text.font.main, 12)
+    GameTooltipText:SetFont(V.defaults.text.font.main, 11)
+    GameTooltipTextSmall:SetFont(V.defaults.text.font.main, 9)
     return tt
 end
 V.Tooltip = Tooltip

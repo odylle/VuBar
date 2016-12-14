@@ -126,9 +126,12 @@ end
 
 local function GetArtifactPower(i)
     local artifact
-    local _, _, _, _, totalXP, pointsSpent = GetEquippedArtifactInfo()
+    local artifactItemID, _, _, _, totalXP, pointsSpent = GetEquippedArtifactInfo()
     local _, xp, xpForNextPoint = MainMenuBar_GetNumArtifactTraitsPurchasableFromXP(pointsSpent, totalXP)
     local totalRanks = _G.C_ArtifactUI.GetTotalPurchasedRanks()
+    if not ns.PlayerData["artifact"] then ns.PlayerData["artifact"] = {} end
+    if not ns.PlayerData.artifact[artifactItemID] then ns.PlayerData.artifact[artifactItemID] = {} end
+    ns.PlayerData.artifact[artifactItemID]["level"] = totalRanks
     if not i then
         artifact = V.frames.bars.artifact
     else
@@ -140,7 +143,7 @@ local function GetArtifactPower(i)
     artifact.bar:SetValue(xp)
     artifact.bar:SetStatusBarColor(.901, .8, .601, .8)
     artifact.bar:SetBackdropColor(.901, .8, .601, .1)
-    artifact.bar.textLeft:SetText(totalRanks)
+    artifact.bar.textLeft:SetText(totalRanks or ns.PlayerData.artifact[artifactItemID]["level"])
     V.frames.bars.artifact = artifact
 end
 

@@ -139,6 +139,9 @@ QueueStatusMinimapButton:SetSize(V.defaults.frame.width,20)
 QueueStatusMinimapButton:SetFrameStrata('HIGH')
 QueueStatusMinimapButton:SetPoint('BOTTOMRIGHT', queueFrame, 0, 0)
 QueueStatusMinimapButton:DisableDrawLayer("OVERLAY")
+for k,v in QueueStatusMinimapButton:GetChildren() do
+    print(k, v)
+end
 
 
 -- Location Text -----------------
@@ -194,6 +197,7 @@ a2:SetOrder(2)
 a2:SetFromAlpha(1)
 a2:SetToAlpha(0)
 a2:SetDuration(0.6)
+mailFrame.ag = mailFrame
 baseFrame.mailFrame = mailFrame
 
 

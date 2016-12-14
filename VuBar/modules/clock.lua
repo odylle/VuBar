@@ -47,10 +47,14 @@ local module = {
 ----------------------------------
 
 local function OnEnter(self)
-    local tt = Tooltip()
-    tt:SetOwner(self, "ANCHOR_TOPLEFT", 0, 0)
+    local tt = slef.tt or Tooltip()
+    tt:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 0, 0)
+    tt:SetWidth(V.defaults.tooltip.width)
+    tt:SetBackdropColor(unpack(V.defaults.tooltip.background))
+    tt:AddLine(" ")
     tt:AddLine(module.name)
     self.tt = tt
+    tt:Show()
     -- GameTooltip:SetOwner(self,"ANCHOR_BOTTOMRIGHT",0,0)
 
     -- if not hover then

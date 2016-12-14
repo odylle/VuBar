@@ -50,6 +50,22 @@ local function goldValue()
     return gold
 end
 
+local function gold_OnEnter(self)
+    local tt = self.tt or Tooltip()
+    tt:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 0, 0)
+    tt:SetWidth(V.defaults.tooltip.width)
+    tt:SetBackdropColor(unpack(V.defaults.tooltip.background))
+    tt:AddLine(" ")
+    tt:AddLine(module.name)
+    tt:AddDoubleLine("Goud", "Silver")
+    self.tt = tt
+    tt:Show()    
+end
+
+local function OnLeave(self)
+    if (self.tt:isShown()) then self.tt:Hide() end
+end
+
 ----------------------------------
 -- Base Frame
 ----------------------------------
@@ -67,6 +83,8 @@ if V.debug then DebugFrame(baseFrame) end
 local goldFrame = CreateFrame("FRAME","$parent.Gold", baseFrame)
 goldFrame:SetSize(V.defaults.frame.width, 30)
 goldFrame:SetPoint("TOP", 0, -(module.padding))
+goldFrame:SetScript("OnEnter", gold_OnEnter) 
+goldFrame:SetScript("OnLeave", OnLeave)
 module.height = module.height + goldFrame:GetHeight()
 
 local goldText = goldFrame:CreateFontString(nil, "OVERLAY")
@@ -134,7 +152,7 @@ EventFrame:SetScript("OnEvent", V.EventHandler)
 
 function EventFrame:PLAYER_ENTERING_WORLD()
     g = goldValue()
-    if not ns.playerData["gold"] then ns.playerData["gold"] = g end
+    if not ns.playerData["gold"] then ns.playerData["gold"] = GetMoney() end
     V.frames.resources.goldText:SetText(g)
     -- First Currency:
     name, currentAmount, _, earnedThisWeek, weeklyMax, totalMax = GetCurrencyInfo(module.currency1)

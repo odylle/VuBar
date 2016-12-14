@@ -78,6 +78,11 @@ local defaults = {
 		background = {0, 0, 0, .35 },
 		anchor = "TOP",
 	},
+    tooltip = {
+        width = 160,
+        strata = "TOOLTIP",
+        background = {0, 0, 0, .7}
+    }
 }
 V.defaults = defaults
 
@@ -191,8 +196,8 @@ function EventFrame:ADDON_LOADED(arg)
     ns.VARS = VARS
 
     if not VARS[constants.player.realm] then VARS[constants.player.realm] = {} end
-    if not VARS[constants.player.ream][constants.player.name] then VARS[constants.player.ream][constants.player.name] = {} end
-    ns.playerData = VARS[constants.player.ream][constants.player.name]
+    if not VARS[constants.player.realm][constants.player.name] then VARS[constants.player.realm][constants.player.name] = {} end
+    ns.playerData = VARS[constants.player.realm][constants.player.name]
 
     self:RegisterEvent("PLAYER_LOGIN")
     self:RegisterEvent("PLAYER_LOGOUT")
