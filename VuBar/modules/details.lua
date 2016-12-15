@@ -133,10 +133,14 @@ local function ClearWindows(window)
     local bars = { window:GetChildren() }
     for _, bar in pairs(bars) do
         bar:SetValue(0)
+        r, g, b = bar:GetBackdropColor()
+        bar:SetBackdropColor(r,g,b,0)
         bar.name:SetText("")
         bar.value:SetText("")
     end
 end
+
+local 
 ----------------------------------
 -- Base Frame
 ----------------------------------
@@ -197,10 +201,6 @@ window2BarsFrame:SetPoint("TOP", 0, -20)
 window2BarsFrame:HookScript("OnUpdate", HealerOnUpdate)
 baseFrame.window2BarsFrame = window2BarsFrame
 
-
-
-
-
 -- Recalc. baseFrame height ------
 module.height = module.height+module.padding
 baseFrame:SetHeight(module.height)
@@ -228,6 +228,9 @@ end
 ----------------------------------
 -- Event Handling
 ----------------------------------
+local EventFrame = CreateFrame("Frame")
+EventFrame:SetScript("OnEvent", V.EventHandler)
+
 function EventFrame:PLAYER_ENTERING_WORLD()
 
 end

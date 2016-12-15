@@ -20,3 +20,4 @@ modules/group.lua
 modules/minimap.lua
 modules/bars.lua
 modules/details.lua
+# modules/calltoarms.lua

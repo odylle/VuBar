@@ -81,7 +81,7 @@ local defaults = {
     tooltip = {
         width = 160,
         strata = "TOOLTIP",
-        background = {0, 0, 0, .7}
+        background = {0, 0, 0, .8}
     }
 }
 V.defaults = defaults

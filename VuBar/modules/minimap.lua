@@ -96,8 +96,7 @@ minimapFrame:SetSize(V.defaults.frame.width, V.defaults.frame.width)
 minimapFrame:SetPoint("TOP")
 minimapFrame:SetFrameStrata("BACKGROUND")
 
-
--- -- Define Minimap Shape:
+-- Define Minimap Shape:
 MinimapCluster:ClearAllPoints()
 MinimapCluster:SetPoint('TOP', minimapFrame, 'TOP', 1, -1)
 MinimapCluster:EnableMouse(false)
@@ -139,9 +138,14 @@ QueueStatusMinimapButton:SetSize(V.defaults.frame.width,20)
 QueueStatusMinimapButton:SetFrameStrata('HIGH')
 QueueStatusMinimapButton:SetPoint('BOTTOMRIGHT', queueFrame, 0, 0)
 QueueStatusMinimapButton:DisableDrawLayer("OVERLAY")
-for k,v in QueueStatusMinimapButton:GetChildren() do
-    print(k, v)
+-- Hmmmm....
+local dt = V.DebugTable
+local text
+for k,v in pairs(QueueStatusMinimapButton:GetChildren()) do
+    text = text..k..":"..v.."\r\n"
 end
+dt.t:SetText(text)
+
 
 
 -- Location Text -----------------
@@ -197,7 +201,7 @@ a2:SetOrder(2)
 a2:SetFromAlpha(1)
 a2:SetToAlpha(0)
 a2:SetDuration(0.6)
-mailFrame.ag = mailFrame
+mailFrame.ag = ag
 baseFrame.mailFrame = mailFrame
 
 

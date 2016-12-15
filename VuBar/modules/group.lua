@@ -32,92 +32,87 @@ local module = {
 ----------------------------------
 -- Functions
 ----------------------------------
-local function GroupType()
-    if not IsInGroup() then return end
-    local groupType = ""
-    local inInstanceGroup = IsInGroup(LE_PARTY_CATEGORY_INSTANCE)
-    if inInstanceGroup then
-        local name, gType, difficulty, difficultyName, maxPlayers, playerDifficulty, isDynamicInstance, mapID, instanceGroupSize = GetInstanceInfo()
-        groupType = gType
-    else
+
+-- Unit Naming in Group ----------
+local function GetUnit()
+    if IsInGroup() then
+        local unit = "party"
         if IsInRaid() then
-            groupType = "Raid"
+            unit = "raid"
         else
-            groupType = "Party"
+            local isInstance, instanceType = IsInInstance()
+            if isInstance then
+                if instanceType == "arena" then
+                    unit = "arena"
+                end
+            end
         end
-    end
-    return groupType
+    else return end
+    return unit
 end
 
+-- Leader ------------------------
 local function GroupLeader()
-    local unit = ""
-    local leader, loot, group = "", "", ""
-    local groupSize = GetNumGroupMembers()
-    local start = 1;
-    if IsInRaid() then unit = "raid"; else unit = "party"; local start = 0; end
-    for i = start, groupSize do
-        if start == 0 then unit = "player" else unit = unit..i end
-        if UnitIsGroupLeader(unit) then
-            local class, classFileName, classIndex = UnitClass(unit)
-            local color = format("%02X%02X%02X", RAID_CLASS_COLORS[classFileName].r*255, RAID_CLASS_COLORS[classFileName].g*255, RAID_CLASS_COLORS[classFileName].b*255)
-            leader = format("|cff%s%s|r", color, UnitName(unit))
-            return leader
+    local leader
+    if UnitIsGroupLeader("player") then
+        local color = format("%02X%02X%02X", RAID_CLASS_COLORS[V.constants.player.class].r*255, RAID_CLASS_COLORS[V.constants.player.class].g*255, RAID_CLASS_COLORS[V.constants.player.class].b*255)
+        leader = format("|cff%s%s|r", color, V.constants.player.name)
+    else
+        local unit = GetUnit()
+        local groupSize = GetNumGroupMembers()
+        for i = 1, groupSize do
+            unit = unit .. i
+            if UnitIsGroupLeader(unit) then
+                local class, classFileName, classIndex = UnitClass(unit)
+                local color = format("%02X%02X%02X", RAID_CLASS_COLORS[classFileName].r*255, RAID_CLASS_COLORS[classFileName].g*255, RAID_CLASS_COLORS[classFileName].b*255)
+                leader = format("|cff%s%s|r", color, UnitName(unit)) 
+            end
         end
     end
+    return leader
 end
 
-local function GroupHealth()
-    local unit = ""
-    local tank, heal, damage = { alive = 0, total = 0 }, { alive = 0, total = 0 }, { alive = 0, total = 0 }
+-- SubGroup in Raids -------------
+local function InSubGroup()
     local groupSize = GetNumGroupMembers()
-    local start = 1;
-    if IsInRaid() then unit = "raid"; else unit = "party"; local start = 0; end
-    for i = start, groupSize do
-        if start == 0 then unit = "player" else unit = unit..i; end
-        local role = UnitGroupRolesAssigned(unit)
-        if role == "HEALER" then
-            heal.total = heal.total  + 1
-            if not UnitIsDeadOrGhost(unit) then heal.alive = heal.alive + 1 end
-        elseif role == "TANK" then
-            tank.total = tank.total + 1
-            if not UnitIsDeadOrGhost(unit) then tank.alive = tank.alive + 1 end
-        else --if role == "DAMAGER" then
-            damage.total = damage.total + 1
-            if not UnitIsDeadOrGhost(unit) then damage.alive = damage.alive + 1 end
-        end
-    end
-    if tank.alive == tank.total then 
-        tank = tank.total
-    else
-        tank = format("|cffff0000%s|r/%s", tank.alive, tank.total)
-    end
-    if heal.alive == heal.total then 
-        heal = heal.total
-    else
-        heal = format("|cffff0000%s|r/%s", heal.alive, heal.total)
-    end
-    if damage.alive == damage.total then 
-        damage = damage.total
-    else
-        damage = format("|cffff0000%s|r/%s", damage.alive, damage.total)
-    end
-    return tank, heal, damage
-end
-
-local function RaidGroup()
-    local unit = ""
-    local _i = 1
-    if IsInRaid() then unit = "raid" else unit = "party"; _i = 0; end
-    for i = _i, GetNumGroupMembers() do 
-        unit = unit..i
-        if i == 0 then unit = "player" end
-        local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML = GetRaidRosterInfo(i)
-        if (UnitIsUnit(unit,"player")) then
+    local unit = GetUnit()
+    for i = 1, groupSize do
+        local _, _, subgroup = GetRaidRosterInfo(i)
+        if (UnitIsUnit(unit..i, "player")) then
             return subgroup
         end
     end
 end
 
+-- DPS, Healers & Tanks ----------
+local function GroupComposition()
+    local roles = {"DAMAGER" = 0, "HEALER" = 0, "TANK" = 0}
+    local groupSize = GetNumGroupMembers()
+    if not IsInRaid() then
+        local isArena = IsActiveBattlefieldArena()
+        if not isArena then
+            local role = UnitGroupRolesAssigned("player")
+            roles[role] = roles[role] + 1
+            for i = 1, (groupSize-1) do
+                local role = UnitGroupRolesAssigned("party"..i)
+                roles[role] = roles[role] + 1
+            end
+        else
+            for i = 1, groupSize do
+                local role = UnitGroupRolesAssigned("arena"..i)
+                roles[role] = roles[role] + 1                
+            end
+        end
+    else
+        for i = 1, groupSize do
+            local role = UnitGroupRolesAssigned("raid"..i)
+            roles[role] = roles[role] + 1             
+        end
+    end
+    return roles
+end
+
+-- Loot Method -------------------
 local function LootMethod()
     local method, _, _ = GetLootMethod()
     if method == "freeforall" then
@@ -135,16 +130,103 @@ local function LootMethod()
     end
 end
 
+-- Type of Group -----------------
+local function GroupTypeText()
+    local text
+    local isInstance, instanceType = IsInInstance()
+    local inGuildGroup = InGuildParty()
+    if isInstance then
+        local name, groupType, difficulty, difficultyName, maxPlayers, playerDifficulty, isDynamicInstance, mapID, instanceGroupSize = GetInstanceInfo()
+        if groupType == "arena" then
+            text = "Arena"
+        elseif groupType == "party" then
+            text = "Party"
+        elseif groupType == "pvp" then
+            text = "Battleground"
+        elseif groupType == "raid" then
+            text = "Raid"
+        else
+            text = "Unknown"
+        end 
+    else
+        if IsInRaid() then
+            text = "Raid"
+        else
+            text = "Party"
+        end
+    end
+    if inGuildGroup then
+        text = format("|cffff7f3f%s|r", text)
+    end
+    return text
+end
+
+-- Group Health ------------------
 local function GroupOnUpdate(self, e)
+    local roles = {"DAMAGER", "HEALER" ,"TANK"}
+    local dead = {"DAMAGER" = 0, "HEALER" = 0,"TANK" = 0}
+    local groupSize = GetNumGroupMembers()
+    local damagerHealth, healerHealth, tankHealth
     elapsed = elapsed + e
-    if elapsed > 1 then
-       local tanks, healers, dps = GroupHealth()
-        V.frames.group.healerTotalText:SetText(healers)
-        V.frames.group.tankTotalText:SetText(tanks)
-        V.frames.group.dpsTotalText:SetText(dps)
+    if elapsed >= 1 then
+        roles.DAMAGER = V.frames.group.dpsTotalText:GetText() or 0
+        roles.HEALER = V.frames.group.healerTotalText:GetText() or 0
+        roles.TANK = V.frames.group.tankTotalText:GetText() or 0
+        if IsInRaid() then
+            for i = 1, groupSize do
+                local role = UnitGroupRolesAssigned("raid"..i)
+                local _, _, _, _, _, _, _, _, isDead = GetRaidRosterInfo(i)
+                if isDead then
+                    dead[role] = dead[role] + 1
+                end
+            end
+        else
+            local isArena = IsActiveBattlefieldArena()
+            if not isArena then
+                local role = UnitGroupRolesAssigned("player")
+                if UnitIsDeadOrGhost("player") then
+                    dead[role] = dead[role] + 1
+                end
+                for i = 1, (groupSize-1) do
+                    local role = UnitGroupRolesAssigned("party"..i)
+                    if UnitIsDeadOrGhost("party"..i) then
+                        dead[role] = dead[role] + 1
+                    end
+                end
+            else
+                for i = 1, groupSize do
+                    local role = UnitGroupRolesAssigned("arena"..i)
+                    if UnitIsDeadOrGhost("arena"..i) then
+                        dead[role] = dead[role] + 1
+                    end
+                end
+            end
+        end
+        -- DAMAGERS
+        if roles.DAMAGER >= dead.DAMAGER then
+            damagerHealth = format("|cffff0000%s|r/%s", roles.DAMAGER, dead.DAMAGER)
+        else
+            damagerHealth = roles.DAMAGER
+        end
+        V.frames.group.dpsTotalText:SetText(damagerHealth) 
+        -- HEALER
+        if roles.HEALER >= dead.HEALER then
+            healerHealth = format("|cffff0000%s|r/%s", roles.HEALER, dead.HEALER)
+        else
+            healerHealth = roles.HEALER
+        end
+        V.frames.group.healerTotalText:SetText(healerHealth) 
+        -- DAMAGERS
+        if roles.TANK >= dead.TANK then
+            tankHealth = format("|cffff0000%s|r/%s", roles.TANK, dead.TANK)
+        else
+            tankHealth = roles.TANK
+        end
+        V.frames.group.tankTotalText:SetText(tankHealth) 
         elapsed = 0
     end
 end
+
 ----------------------------------
 -- Base Frame
 ----------------------------------
@@ -226,8 +308,8 @@ baseFrame.lootMethod = lootMethodRText
 local groupCompositionFrame = CreateFrame("FRAME", "$parent.Composition", baseFrame)
 groupCompositionFrame:SetSize(V.defaults.frame.width, 40)
 groupCompositionFrame:SetPoint("TOP", 0, -(55+module.padding))
-module.height = module.height+groupCompositionFrame:GetHeight()
 groupCompositionFrame:SetScript("OnUpdate", GroupOnUpdate)
+module.height = module.height+groupCompositionFrame:GetHeight()
 
 -- Tanks -------------------------
 local tankFrame = CreateFrame("FRAME", "$parent.tank", baseFrame)
@@ -290,7 +372,6 @@ dpsTotalBText:SetPoint("BOTTOM", dpsFrame, "BOTTOM", 0, 1)
 dpsTotalBText:SetText("dps")
 
 
-
 -- Recalc. baseFrame height ------
 module.height = module.height+module.padding
 baseFrame:SetHeight(module.height)
@@ -308,42 +389,53 @@ EventFrame:SetScript("OnEvent", V.EventHandler)
 function EventFrame:PLAYER_ENTERING_WORLD()
     if IsInGroup() or IsInRaid() then
         V.frames.group:Show()
-        V.frames.group.groupTypeName:SetText(GroupType())
+        -- Leader
         V.frames.group.leaderName:SetText(GroupLeader())
-        local tanks, healers, dps = GroupHealth()
-        V.frames.group.healerTotalText:SetText(healers)
-        V.frames.group.tankTotalText:SetText(tanks)
-        V.frames.group.dpsTotalText:SetText(dps)
+        -- Type of group
+        V.frames.group.groupTypeName:SetText(GroupTypeText())
+        -- Composition
+        local roles = GroupComposition()
+        V.frames.group.healerTotalText:SetText(roles.HEALER)
+        V.frames.group.tankTotalText:SetText(roles.TANK)
+        V.frames.group.dpsTotalText:SetText(roles.DAMAGER)        
+        -- Subgroup
+        if IsInRaid() then
+            V.frames.group.groupTypeGroup:SetText(InSubGroup())
+        end
         -- Loot Method
-        V.frames.group.lootMethod:SetText(LootMethod())
-    elseif IsInRaid() then
-        V.frames.group.groupTypeGroup:SetText(RaidGroup())
+        V.frames.group.lootMethod:SetText(LootMethod())         
     else
         V.frames.group:Hide()
     end
 end
 
 function EventFrame:GROUP_JOINED()
-    if IsInGroup() or IsInRaid() then
-        V.frames.group:Show()
-        V.frames.group.groupTypeName:SetText(GroupType())
-        V.frames.group.leaderName:SetText(GroupLeader())
-        -- Loot Method
-        V.frames.group.lootMethod:SetText(LootMethod())
-    elseif IsInRaid() then
-        V.frames.group.groupTypeGroup:SetText(RaidGroup())
-    else
-        V.frames.group:Hide()
+    V.frames.group:Show()
+    -- Leader
+    V.frames.group.leaderName:SetText(GroupLeader())
+    -- Type of group
+    V.frames.group.groupTypeName:SetText(GroupTypeText())    
+    -- Composition
+    local roles = GroupComposition()
+    V.frames.group.healerTotalText:SetText(roles.HEALER)
+    V.frames.group.tankTotalText:SetText(roles.TANK)
+    V.frames.group.dpsTotalText:SetText(roles.DAMAGER)
+    -- Subgroup
+    if IsInRaid() then
+        V.frames.group.groupTypeGroup:SetText(InSubGroup())
     end
+    -- Loot Method
+    V.frames.group.lootMethod:SetText(LootMethod()) 
 end
 
 function EventFrame:GROUP_ROSTER_UPDATE()
-    local tanks, healers, dps = GroupHealth()
-    V.frames.group.healerTotalText:SetText(healers)
-    V.frames.group.tankTotalText:SetText(tanks)
-    V.frames.group.dpsTotalText:SetText(dps)
+    -- Composition
+    local roles = GroupComposition()
+    V.frames.group.healerTotalText:SetText(roles.HEALER)
+    V.frames.group.tankTotalText:SetText(roles.TANK)
+    V.frames.group.dpsTotalText:SetText(roles.DAMAGER)     
     if IsInRaid() then
-        V.frames.group.groupTypeGroup:SetText(RaidGroup())
+        V.frames.group.groupTypeGroup:SetText(InSubGroup())
     end
 end
 
@@ -362,14 +454,42 @@ function EventFrame:PARTY_LOOT_METHOD_CHANGED()
     V.frames.group.lootMethod:SetText(LootMethod())
 end
 
+function EventFrame:PARTY_CONVERTED_TO_RAID()
+    -- Type of group
+    V.frames.group.groupTypeName:SetText(GroupTypeText())
+    if IsInRaid() then
+        V.frames.group.groupTypeGroup:SetText(InSubGroup())
+    end 
+end
+
+function EventFrame:PARTY_MEMBERS_CHANGED()
+    if not IsInGroup() and not IsInRaid() then
+        V.frames.group:Hide()
+    end
+end
+
+function EventFrame:INSTANCE_GROUP_SIZE_CHANGED()
+    local roles = GroupComposition()
+    V.frames.group.healerTotalText:SetText(roles.HEALER)
+    V.frames.group.tankTotalText:SetText(roles.TANK)
+    V.frames.group.dpsTotalText:SetText(roles.DAMAGER)
+    -- Type of group
+    V.frames.group.groupTypeName:SetText(GroupTypeText())     
+end
+
 -- EVENTS ------------------------
 local events = {
     "PLAYER_ENTERING_WORLD",
     "GROUP_ROSTER_UPDATE",
     "GROUP_JOINED",
+    "PARTY_CONVERTED_TO_RAID",
     "PARTY_LEADER_CHANGED",
-    "ZONE_CHANGED_NEW_AREA",
     "PARTY_LOOT_METHOD_CHANGED",
+    "PARTY_MEMBERS_CHANGED",
+    "INSTANCE_GROUP_SIZE_CHANGED"
+    "ZONE_CHANGED_NEW_AREA",
+    "PLAYER_SPECIALIZATION_CHANGED",
+    "PLAYER_DIFFICULTY_CHANGED",
 }
 -- REGISTER IF NOT REGISTERED ----
 for i, e in ipairs(events) do

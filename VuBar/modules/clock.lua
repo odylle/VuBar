@@ -5,7 +5,7 @@ local addon, ns = ...
 local V = ns.V
 local EventHandler, DebugFrame, Tooltip = V.EventHandler, V.DebugFrame, V.Tooltip
 
-local hover = false
+local raidInfo = false
 local lockoutColorExtended, lockoutColorNormal = { r=0.3,g=1,b=0.3 }, { r=.8,g=.8,b=.8 }
 local lockoutInfoFormat = "%s%s |cffaaaaaa(%s, %s/%s)"
 local lockoutInfoFormatNoEnc = "%s%s |cffaaaaaa(%s)"
@@ -47,77 +47,78 @@ local module = {
 ----------------------------------
 
 local function OnEnter(self)
-    local tt = slef.tt or Tooltip()
-    tt:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 0, 0)
+    if not raidInfo then
+        RequestRaidInfo()
+    end
+
+    local tt = V.tt or Tooltip()
+    tt:SetOwner(self, "ANCHOR_TOPRIGHT", 0, 0)
     tt:SetWidth(V.defaults.tooltip.width)
     tt:SetBackdropColor(unpack(V.defaults.tooltip.background))
-    tt:AddLine(" ")
+    tt:SetMinimumWidth(160) 
     tt:AddLine(module.name)
-    self.tt = tt
+    local hour, minute = GetGameTime()
+    if hour < 10 then hour = ("0"..hour) end
+    if minute < 10 then minute = ("0"..minute) end     
+    tt:AddDoubleLine("Server Time", hour..":"..minute, .8, .8, .8, 1, 1, 1)
+
+    if raidInfo then
+        local lockedInstances = {raids = {}, dungeons = {}}
+        for i = 1, GetNumSavedInstances() do
+            local name, instanceId, _, difficulty, locked, extended, _, isRaid, _, _, _, _  = GetSavedInstanceInfo(i)
+            if (locked or extended) and name then
+                if isRaid then
+                    lockedInstances["raids"][instanceId] = {GetSavedInstanceInfo(i)}
+                elseif not isRaid and difficulty == 23 then
+                    lockedInstances["dungeons"][instanceId] = {GetSavedInstanceInfo(i)}
+                end
+            end
+        end
+        -- Raids -------------------------
+        if next(lockedInstances["raids"]) then
+            GameTooltip:AddLine(" ")
+            GameTooltip:AddLine("Saved Raid(s)")
+
+            for pos,instance in pairs(lockedInstances["raids"]) do
+                name, _, reset, difficultyId, _, extended, _, _, maxPlayers, _, numEncounters, encounterProgress = unpack(instance)
+
+                local lockoutColor = extended and lockoutColorExtended or lockoutColorNormal
+                local _, _, isHeroic, _, displayHeroic, displayMythic = GetDifficultyInfo(difficultyId)
+                if (numEncounters and numEncounters > 0) and (encounterProgress and encounterProgress > 0) then
+                    GameTooltip:AddDoubleLine(format(lockoutInfoFormat, maxPlayers, (displayMythic and "M" or (isHeroic or displayHeroic) and "H" or "N"), name, encounterProgress, numEncounters), SecondsToTime(reset, false, nil, 3), 1, 1, 1, 1, 1, 1)
+                else
+                    GameTooltip:AddDoubleLine(format(lockoutInfoFormatNoEnc, maxPlayers, (displayMythic and "M" or (isHeroic or displayHeroic) and "H" or "N"), name), SecondsToTime(reset, false, nil, 3), 1, 1, 1, 1, 1, 1)
+                end
+            end
+        end
+        -- Dungeons ----------------------
+        if next(lockedInstances["dungeons"]) then
+            GameTooltip:AddLine(" ")
+            GameTooltip:AddLine("Saved Dungeon(s)")
+
+            for pos,instance in pairs(lockedInstances["dungeons"]) do
+                name, _, reset, difficultyId, _, extended, _, _, maxPlayers, _, numEncounters, encounterProgress = unpack(instance)
+
+                local lockoutColor = extended and lockoutColorExtended or lockoutColorNormal
+                local _, _, isHeroic, _, displayHeroic, displayMythic = GetDifficultyInfo(difficultyId)
+                if (numEncounters and numEncounters > 0) and (encounterProgress and encounterProgress > 0) then
+                    GameTooltip:AddDoubleLine(format(lockoutInfoFormat, maxPlayers, (displayMythic and "M" or (isHeroic or displayHeroic) and "H" or "N"), name, encounterProgress, numEncounters), SecondsToTime(reset, false, nil, 3), 1, 1, 1, 1, 1, 1)
+                else
+                    GameTooltip:AddDoubleLine(format(lockoutInfoFormatNoEnc, maxPlayers, (displayMythic and "M" or (isHeroic or displayHeroic) and "H" or "N"), name), SecondsToTime(reset, false, nil, 3), 1, 1, 1, 1, 1, 1)
+                end
+            end
+        end       
+    end
+
+    tt:AddLine(" ")
+    tt:AddDoubleLine("<Left-click>", "Open Calendar", 1, 1, 0, 1, 1, 1)
+    V.tt = tt
     tt:Show()
-    -- GameTooltip:SetOwner(self,"ANCHOR_BOTTOMRIGHT",0,0)
-
-    -- if not hover then
-    --     RequestRaidInfo()
-    --     hover = true
-    -- end
-
-    -- local lockedInstances = {raids = {}, dungeons = {}}
-    -- for i = 1, GetNumSavedInstances() do
-    --     local name, instanceId, _, difficulty, locked, extended, _, isRaid, _, _, _, _  = GetSavedInstanceInfo(i)
-    --     if (locked or extended) and name then
-    --         if isRaid then
-    --             lockedInstances["raids"][instanceId] = {GetSavedInstanceInfo(i)}
-    --         elseif not isRaid and difficulty == 23 then
-    --             lockedInstances["dungeons"][instanceId] = {GetSavedInstanceInfo(i)}
-    --         end
-    --     end
-    -- end
-    -- -- Raids -------------------------
-    -- if next(lockedInstances["raids"]) then
-    --     GameTooltip:AddLine(" ")
-    --     GameTooltip:AddLine("Saved Raid(s)")
-
-    --     for pos,instance in pairs(lockedInstances["raids"]) do
-    --         name, _, reset, difficultyId, _, extended, _, _, maxPlayers, _, numEncounters, encounterProgress = unpack(instance)
-
-    --         local lockoutColor = extended and lockoutColorExtended or lockoutColorNormal
-    --         local _, _, isHeroic, _, displayHeroic, displayMythic = GetDifficultyInfo(difficultyId)
-    --         if (numEncounters and numEncounters > 0) and (encounterProgress and encounterProgress > 0) then
-    --             GameTooltip:AddDoubleLine(format(lockoutInfoFormat, maxPlayers, (displayMythic and "M" or (isHeroic or displayHeroic) and "H" or "N"), name, encounterProgress, numEncounters), SecondsToTime(reset, false, nil, 3), 1, 1, 1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
-    --         else
-    --             GameTooltip:AddDoubleLine(format(lockoutInfoFormatNoEnc, maxPlayers, (displayMythic and "M" or (isHeroic or displayHeroic) and "H" or "N"), name), SecondsToTime(reset, false, nil, 3), 1, 1, 1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
-    --         end
-    --     end
-    -- end
-    -- -- Dungeons ----------------------
-    -- if next(lockedInstances["dungeons"]) then
-    --     GameTooltip:AddLine(" ")
-    --     GameTooltip:AddLine("Saved Dungeon(s)")
-
-    --     for pos,instance in pairs(lockedInstances["dungeons"]) do
-    --         name, _, reset, difficultyId, _, extended, _, _, maxPlayers, _, numEncounters, encounterProgress = unpack(instance)
-
-    --         local lockoutColor = extended and lockoutColorExtended or lockoutColorNormal
-    --         local _, _, isHeroic, _, displayHeroic, displayMythic = GetDifficultyInfo(difficultyId)
-    --         if (numEncounters and numEncounters > 0) and (encounterProgress and encounterProgress > 0) then
-    --             GameTooltip:AddDoubleLine(format(lockoutInfoFormat, maxPlayers, (displayMythic and "M" or (isHeroic or displayHeroic) and "H" or "N"), name, encounterProgress, numEncounters), SecondsToTime(reset, false, nil, 3), 1, 1, 1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
-    --         else
-    --             GameTooltip:AddDoubleLine(format(lockoutInfoFormatNoEnc, maxPlayers, (displayMythic and "M" or (isHeroic or displayHeroic) and "H" or "N"), name), SecondsToTime(reset, false, nil, 3), 1, 1, 1, lockoutColor.r, lockoutColor.g, lockoutColor.b)
-    --         end
-    --     end
-    -- end
-
-    -- GameTooltip:AddLine(" ")
-    -- GameTooltip:AddDoubleLine("<Left-click>", "Open Calendar", 1, 1, 0, 1, 1, 1)
-    -- GameTooltip:AddDoubleLine("<Right-click>", "Open Clock", 1, 1, 0, 1, 1, 1)
-    -- GameTooltip:Show()
-
 end
 
 local function OnLeave(self)
     --if ( GameTooltip:IsShown() ) then GameTooltip:Hide() end
-    if (self.tt:IsShown()) then self.tt:Hide() end
+    if (V.tt:IsShown()) then V.tt:Hide() end
     --hover = false
 end
 
@@ -251,9 +252,7 @@ function EventFrame:PLAYER_FLAGS_CHANGED(arg1)
 end
 
 function EventFrame:UPDATE_INSTANCE_INFO()
-    if hover then
-        OnEnter(self)
-    end
+    raidInfo = true
 end
 
 -- EVENTS ------------------------

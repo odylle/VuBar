@@ -3,7 +3,7 @@ local addon, ns = ...
 -- Variables
 ----------------------------------
 local V = ns.V
-local EventHandler, EventFrame, Shorten, DebugFrame = V.EventHandler, V.EventFrame, V.Shorten, V.DebugFrame
+local EventHandler, EventFrame, Shorten, Tooltip, DebugFrame = V.EventHandler, V.EventFrame, V.Shorten, V.Tooltip, V.DebugFrame
 
 ----------------------------------
 -- Blizz Api & Variables
@@ -129,9 +129,9 @@ local function GetArtifactPower(i)
     local artifactItemID, _, _, _, totalXP, pointsSpent = GetEquippedArtifactInfo()
     local _, xp, xpForNextPoint = MainMenuBar_GetNumArtifactTraitsPurchasableFromXP(pointsSpent, totalXP)
     local totalRanks = _G.C_ArtifactUI.GetTotalPurchasedRanks()
-    if not ns.PlayerData["artifact"] then ns.PlayerData["artifact"] = {} end
-    if not ns.PlayerData.artifact[artifactItemID] then ns.PlayerData.artifact[artifactItemID] = {} end
-    ns.PlayerData.artifact[artifactItemID]["level"] = totalRanks
+    if not ns.playerData["artifact"] then ns.playerData["artifact"] = {} end
+    if not ns.playerData.artifact[artifactItemID] then ns.playerData.artifact[artifactItemID] = {} end
+    ns.playerData.artifact[artifactItemID]["level"] = totalRanks
     if not i then
         artifact = V.frames.bars.artifact
     else
@@ -144,6 +144,7 @@ local function GetArtifactPower(i)
     artifact.bar:SetStatusBarColor(.901, .8, .601, .8)
     artifact.bar:SetBackdropColor(.901, .8, .601, .1)
     artifact.bar.textLeft:SetText(totalRanks or ns.PlayerData.artifact[artifactItemID]["level"])
+    artifact.bar.textRight:SetText("")
     V.frames.bars.artifact = artifact
 end
 
@@ -189,6 +190,7 @@ local function UpdateBars(newLevel)
     end
     --return bars
 end
+
 ----------------------------------
 -- Base Frame
 ----------------------------------

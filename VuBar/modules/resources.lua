@@ -3,7 +3,7 @@ local addon, ns = ...
 -- Variables
 ----------------------------------
 local V = ns.V
-local EventHandler, EventFrame, DebugFrame = V.EventHandler, V.EventFrame, V.DebugFrame
+local EventHandler, EventFrame, Tooltip, DebugFrame = V.EventHandler, V.EventFrame, V.Tooltip, V.DebugFrame
 
 local currencies = {
     ["ANCIENT_MANA"] = 1155,
@@ -19,10 +19,13 @@ local currencies = {
 ----------------------------------
 local GetCurrencyInfo = GetCurrencyInfo
 local GetMoney = GetMoney
+local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 
 
 -- LUA Functions -----------------
 local abs = abs
+local pairs = pairs
+local format = string.format
 
 ----------------------------------
 -- Module Config
@@ -50,20 +53,45 @@ local function goldValue()
     return gold
 end
 
+local function stripSmallChange(money)
+    gold = abs(money/10000)
+    return gold
+end
+
 local function gold_OnEnter(self)
-    local tt = self.tt or Tooltip()
+    local tt = V.tt or Tooltip()
     tt:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 0, 0)
-    tt:SetWidth(V.defaults.tooltip.width)
+    tt:SetMinimumWidth(160)
     tt:SetBackdropColor(unpack(V.defaults.tooltip.background))
-    tt:AddLine(" ")
     tt:AddLine(module.name)
-    tt:AddDoubleLine("Goud", "Silver")
-    self.tt = tt
+    -- Session Gold Statistics
+    tt:AddLine(" ")
+    tt:AddLine("Session Statistics", .6, .6 ,.6)
+    local session_start = stripSmallChange(VuBarVars[V.constants.player.realm][V.constants.player.name]["gold"] or GetMoney())
+    local session_current = stripSmallChange(GetMoney())
+    --tt:AddDoubleLine("Session Start", session_start, 1, 1, 1, 1, 1, 1)
+    tt:AddDoubleLine("Gold", session_current, 1, 1, 1, 1, 1, 1)
+    if session_start > session_current then
+        tt:AddDoubleLine(" Loss", session_start-session_current, 1, 0, 0, 1, 1, 1)
+    else
+        tt:AddDoubleLine(" Gain", session_current-session_start, 0, .8, 0, 1, 1, 1)
+    end
+    -- Other Characters
+    local realmGold = session_current
+    for name, _ in pairs(VuBarVars[V.constants.player.realm]) do
+        local color = format("%02X%02X%02X", RAID_CLASS_COLORS[VuBarVars[V.constants.player.realm][name]["class"]].r*255, RAID_CLASS_COLORS[VuBarVars[V.constants.player.realm][name]["class"]].g*255, RAID_CLASS_COLORS[VuBarVars[V.constants.player.realm][name]["class"]].b*255)
+        name = format("|cff%s%s|r", color, name)
+        local gold = stripSmallChange(VuBarVars[V.constants.player.realm][name]["gold"] or 0)
+        tt:AddDoubleLine(name, gold)
+        realmGold = realmGold + gold
+    end
+    tt:AddDoubleLine("", realmGold) 
+    V.tt = tt
     tt:Show()    
 end
 
 local function OnLeave(self)
-    if (self.tt:isShown()) then self.tt:Hide() end
+    if (V.tt:IsShown()) then V.tt:Hide() end
 end
 
 ----------------------------------
