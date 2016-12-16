@@ -140,7 +140,6 @@ local function ClearWindows(window)
     end
 end
 
-local 
 ----------------------------------
 -- Base Frame
 ----------------------------------
@@ -243,7 +242,6 @@ end
 -- EVENTS ------------------------
 local events = {
     "PLAYER_ENTERING_WORLD",
-    "PLAYER_ENTER_COMBAT",
     "PLAYER_REGEN_DISABLED"
 }
 -- REGISTER IF NOT REGISTERED ----

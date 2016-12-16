@@ -132,7 +132,7 @@ lootspecLText:SetFont(V.defaults.text.font.main, V.defaults.text.normal)
 lootspecLText:SetTextColor(unpack(V.defaults.text.color.dim))
 lootspecLText:SetJustifyH("LEFT")
 lootspecLText:SetPoint("LEFT", lootspecFrame, "LEFT", 8, 0)
-lootspecLText:SetText("loot specialisation")
+lootspecLText:SetText("loot spec")
 
 local lootspecRText = lootspecFrame:CreateFontString(nil, "OVERLAY")
 lootspecRText:SetFont(V.defaults.text.font.main, V.defaults.text.normal)

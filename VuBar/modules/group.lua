@@ -35,8 +35,9 @@ local module = {
 
 -- Unit Naming in Group ----------
 local function GetUnit()
+    local unit
     if IsInGroup() then
-        local unit = "party"
+        unit = "party"
         if IsInRaid() then
             unit = "raid"
         else
@@ -75,9 +76,9 @@ end
 -- SubGroup in Raids -------------
 local function InSubGroup()
     local groupSize = GetNumGroupMembers()
-    local unit = GetUnit()
     for i = 1, groupSize do
         local _, _, subgroup = GetRaidRosterInfo(i)
+        local unit = GetUnit()
         if (UnitIsUnit(unit..i, "player")) then
             return subgroup
         end
@@ -86,11 +87,12 @@ end
 
 -- DPS, Healers & Tanks ----------
 local function GroupComposition()
-    local roles = {"DAMAGER" = 0, "HEALER" = 0, "TANK" = 0}
+    local roles = {}
+    roles.DAMAGER, roles.HEALER, roles.TANK = 0,0,0 
     local groupSize = GetNumGroupMembers()
     if not IsInRaid() then
         local isArena = IsActiveBattlefieldArena()
-        if not isArena then
+        if not isArena and IsInGroup() then
             local role = UnitGroupRolesAssigned("player")
             roles[role] = roles[role] + 1
             for i = 1, (groupSize-1) do
@@ -163,8 +165,9 @@ end
 
 -- Group Health ------------------
 local function GroupOnUpdate(self, e)
-    local roles = {"DAMAGER", "HEALER" ,"TANK"}
-    local dead = {"DAMAGER" = 0, "HEALER" = 0,"TANK" = 0}
+    local roles = {}
+    roles.DAMAGER, roles.HEALER, roles.TANK = 0,0,0
+    local dead = roles
     local groupSize = GetNumGroupMembers()
     local damagerHealth, healerHealth, tankHealth
     elapsed = elapsed + e
@@ -203,21 +206,21 @@ local function GroupOnUpdate(self, e)
             end
         end
         -- DAMAGERS
-        if roles.DAMAGER >= dead.DAMAGER then
+        if roles.DAMAGER > dead.DAMAGER then
             damagerHealth = format("|cffff0000%s|r/%s", roles.DAMAGER, dead.DAMAGER)
         else
             damagerHealth = roles.DAMAGER
         end
         V.frames.group.dpsTotalText:SetText(damagerHealth) 
         -- HEALER
-        if roles.HEALER >= dead.HEALER then
+        if roles.HEALER > dead.HEALER then
             healerHealth = format("|cffff0000%s|r/%s", roles.HEALER, dead.HEALER)
         else
             healerHealth = roles.HEALER
         end
         V.frames.group.healerTotalText:SetText(healerHealth) 
         -- DAMAGERS
-        if roles.TANK >= dead.TANK then
+        if roles.TANK > dead.TANK then
             tankHealth = format("|cffff0000%s|r/%s", roles.TANK, dead.TANK)
         else
             tankHealth = roles.TANK
@@ -437,6 +440,9 @@ function EventFrame:GROUP_ROSTER_UPDATE()
     if IsInRaid() then
         V.frames.group.groupTypeGroup:SetText(InSubGroup())
     end
+    if not IsInGroup() and not IsInRaid() then
+        V.frames.group:Hide()
+    end
 end
 
 function EventFrame:ZONE_CHANGED_NEW_AREA()
@@ -474,7 +480,18 @@ function EventFrame:INSTANCE_GROUP_SIZE_CHANGED()
     V.frames.group.tankTotalText:SetText(roles.TANK)
     V.frames.group.dpsTotalText:SetText(roles.DAMAGER)
     -- Type of group
-    V.frames.group.groupTypeName:SetText(GroupTypeText())     
+    V.frames.group.groupTypeName:SetText(GroupTypeText())
+    if notIsInGroup() and not IsInRaid() then
+        V.frames.group:Hide()
+    end         
+end
+
+function EventFrame:PLAYER_SPECIALIZATION_CHANGED()
+
+end
+
+function EventFrame:PLAYER_DIFFICULTY_CHANGED()
+
 end
 
 -- EVENTS ------------------------
@@ -486,7 +503,7 @@ local events = {
     "PARTY_LEADER_CHANGED",
     "PARTY_LOOT_METHOD_CHANGED",
     "PARTY_MEMBERS_CHANGED",
-    "INSTANCE_GROUP_SIZE_CHANGED"
+    "INSTANCE_GROUP_SIZE_CHANGED",
     "ZONE_CHANGED_NEW_AREA",
     "PLAYER_SPECIALIZATION_CHANGED",
     "PLAYER_DIFFICULTY_CHANGED",

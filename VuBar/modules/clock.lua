@@ -50,9 +50,8 @@ local function OnEnter(self)
     if not raidInfo then
         RequestRaidInfo()
     end
-
     local tt = V.tt or Tooltip()
-    tt:SetOwner(self, "ANCHOR_TOPRIGHT", 0, 0)
+    tt:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 0, self:GetHeight())
     tt:SetWidth(V.defaults.tooltip.width)
     tt:SetBackdropColor(unpack(V.defaults.tooltip.background))
     tt:SetMinimumWidth(160) 

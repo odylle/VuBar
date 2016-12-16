@@ -138,15 +138,15 @@ QueueStatusMinimapButton:SetSize(V.defaults.frame.width,20)
 QueueStatusMinimapButton:SetFrameStrata('HIGH')
 QueueStatusMinimapButton:SetPoint('BOTTOMRIGHT', queueFrame, 0, 0)
 QueueStatusMinimapButton:DisableDrawLayer("OVERLAY")
--- Hmmmm....
-local dt = V.DebugTable
-local text
-for k,v in pairs(QueueStatusMinimapButton:GetChildren()) do
-    text = text..k..":"..v.."\r\n"
+
+f = V.DebugTable()
+local children = { QueueStatusMinimapButton:GetChildren() }
+local stuff = ""
+for _, child in pairs(children) do
+    local cname = child:Getname()
+    stuff = stuff .. cname .. "\r\n"
 end
-dt.t:SetText(text)
-
-
+f.t:SetText(stuff)
 
 -- Location Text -----------------
 local locationFrame = CreateFrame("FRAME","$parent.Location", minimapFrame)
@@ -245,11 +245,25 @@ function EventFrame:UPDATE_PENDING_MAIL()
     end
 end
 
+function EventFrame:MAIL_CLOSED()
+    if HasNewMail() then
+        V.frames.minimap.mailText:SetText(string.format("|cffff0000new mail|r"))
+        if not V.frames.minimap.mailFrame.ag:IsPlaying() then
+            V.frames.minimap.mailFrame.ag:Play()
+            V.frames.minimap.mailFrame.ag:SetLooping("REPEAT")
+        end     
+    else
+        V.frames.minimap.mailText:SetText("")
+        V.frames.minimap.mailFrame.ag:Stop()
+    end
+end
+
 
 -- EVENTS ------------------------
 local events = {
     "PLAYER_ENTERING_WORLD",
     "UPDATE_PENDING_MAIL",
+    "MAIL_CLOSED",
 }
 -- REGISTER IF NOT REGISTERED ----
 for i, e in ipairs(events) do

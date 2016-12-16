@@ -48,12 +48,12 @@ local function DebugFrame(f)
 end
 V.DebugFrame = DebugFrame
 
-local function DebugTable(f)
+local function DebugTable()
     local f = CreateFrame("FRAME", "$parent.Minimap", UIParent)
     f:SetSize(200, 400)
     f:SetPoint("TOP")
     f:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
-    f:SetBackdropColor(0, 0, 0, 0.2)
+    f:SetBackdropColor(0, 0, 0, 0.6)
 
     local t = f:CreateFontString(nil, "OVERLAY")
     t:SetPoint("CENTER")

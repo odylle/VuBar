@@ -131,7 +131,11 @@ local function GetArtifactPower(i)
     local totalRanks = _G.C_ArtifactUI.GetTotalPurchasedRanks()
     if not ns.playerData["artifact"] then ns.playerData["artifact"] = {} end
     if not ns.playerData.artifact[artifactItemID] then ns.playerData.artifact[artifactItemID] = {} end
-    ns.playerData.artifact[artifactItemID]["level"] = totalRanks
+    if totalRanks ~= 0 then
+        ns.playerData.artifact[artifactItemID]["level"] = totalRanks
+    else 
+        totalRanks = ns.playerData.artifact[artifactItemID]["level"]
+    end
     if not i then
         artifact = V.frames.bars.artifact
     else
@@ -143,8 +147,8 @@ local function GetArtifactPower(i)
     artifact.bar:SetValue(xp)
     artifact.bar:SetStatusBarColor(.901, .8, .601, .8)
     artifact.bar:SetBackdropColor(.901, .8, .601, .1)
-    artifact.bar.textLeft:SetText(totalRanks or ns.PlayerData.artifact[artifactItemID]["level"])
-    artifact.bar.textRight:SetText("")
+    artifact.bar.textLeft:SetText(totalRanks)
+    artifact.bar.textRight:SetText()
     V.frames.bars.artifact = artifact
 end
 
