@@ -70,7 +70,58 @@ local function GetZoneColor()
         return 1, 1, 1
     end
 end
+local function QueueOnLoad(self)
+--For everything
+    self:RegisterEvent("PLAYER_ENTERING_WORLD");
+    self:RegisterEvent("GROUP_ROSTER_UPDATE");
 
+    --For LFG
+    self:RegisterEvent("LFG_UPDATE");
+    self:RegisterEvent("LFG_ROLE_CHECK_UPDATE");
+    self:RegisterEvent("LFG_READY_CHECK_UPDATE");
+    self:RegisterEvent("LFG_PROPOSAL_UPDATE");
+    self:RegisterEvent("LFG_PROPOSAL_FAILED");
+    self:RegisterEvent("LFG_PROPOSAL_SUCCEEDED");
+    self:RegisterEvent("LFG_PROPOSAL_SHOW");
+    self:RegisterEvent("LFG_QUEUE_STATUS_UPDATE");
+
+    --For LFGList
+    self:RegisterEvent("LFG_LIST_ACTIVE_ENTRY_UPDATE");
+    self:RegisterEvent("LFG_LIST_SEARCH_RESULTS_RECEIVED");
+    self:RegisterEvent("LFG_LIST_SEARCH_RESULT_UPDATED");
+    self:RegisterEvent("LFG_LIST_APPLICANT_UPDATED");
+
+    --For PvP Role Checks
+    self:RegisterEvent("PVP_ROLE_CHECK_UPDATED");
+
+    --For PvP
+    self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS");
+
+    --For World PvP stuff
+    self:RegisterEvent("ZONE_CHANGED_NEW_AREA");
+    self:RegisterEvent("ZONE_CHANGED");
+    self:RegisterEvent("BATTLEFIELD_MGR_QUEUE_REQUEST_RESPONSE");
+    self:RegisterEvent("BATTLEFIELD_MGR_QUEUE_STATUS_UPDATE");
+    self:RegisterEvent("BATTLEFIELD_MGR_EJECT_PENDING");
+    self:RegisterEvent("BATTLEFIELD_MGR_EJECTED");
+    self:RegisterEvent("BATTLEFIELD_MGR_QUEUE_INVITE");
+    self:RegisterEvent("BATTLEFIELD_MGR_ENTRY_INVITE");
+    self:RegisterEvent("BATTLEFIELD_MGR_ENTERED");
+
+    --For Pet Battles
+    self:RegisterEvent("PET_BATTLE_QUEUE_STATUS");
+end
+
+local function QueueOnEvent(self)
+    -- PLugin to Blizz system for the eye.
+    if QueueStatusMinimapButton:IsShown() then
+        self.queueFrame:SetBackdropColor(0,0,0,.3)
+        self.queueText:SetText("queued")
+    else
+        self.queueFrame:SetBackdropColor(0,0,0,0)
+        self.queueText:SetText("")
+    end
+end
 ----------------------------------
 -- Base Frame
 ----------------------------------
@@ -123,12 +174,16 @@ queueFrame:SetSize(V.defaults.frame.width-2, 20)
 queueFrame:SetPoint("BOTTOM", minimapFrame, "BOTTOM", 0, 0)
 queueFrame:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
 queueFrame:SetBackdropColor(0, 0, 0, 0.3)
+queueFrame:SetScript("OnLoad", QueueOnLoad)
+queueFrame:SetScript("OnEvent", QueueOnEvent)
+V.frames.queueFrame = queueFrame
 
 local queueText = queueFrame:CreateFontString(nil, "OVERLAY")
 queueText:SetFont(V.defaults.text.font.main, V.defaults.text.normal)
 queueText:SetPoint("CENTER")
-queueText:SetTextColor(V.defaults.text.color.bright)
+queueText:SetTextColor(unpack(V.defaults.text.color.bright))
 queueText:SetText("Queued")
+V.frames.queueText = queueText
 
 --QueueStatusMinimapButton:SetParent(queueFrame)
 --QueueStatusMinimapButton:SetFrameLevel(QueueStatusMinimapButton:GetFrameLevel()+1)
@@ -138,15 +193,17 @@ QueueStatusMinimapButton:SetSize(V.defaults.frame.width,20)
 QueueStatusMinimapButton:SetFrameStrata('HIGH')
 QueueStatusMinimapButton:SetPoint('BOTTOMRIGHT', queueFrame, 0, 0)
 QueueStatusMinimapButton:DisableDrawLayer("OVERLAY")
+QueueStatusMinimapButtonIcon:Hide()
+QueueStatusMinimapButton.Highlight:Hide()
 
-f = V.DebugTable()
-local children = { QueueStatusMinimapButton:GetChildren() }
-local stuff = ""
-for _, child in pairs(children) do
-    local cname = child:Getname()
-    stuff = stuff .. cname .. "\r\n"
-end
-f.t:SetText(stuff)
+-- f = V.DebugTable()
+-- local children = { QueueStatusMinimapButton:GetChildren() }
+-- local stuff = ""
+-- for _, child in pairs(children) do
+--     local cname = child:GetName()
+--     stuff = stuff .. cname .. "\r\n"
+-- end
+-- f.t:SetText(stuff)
 
 -- Location Text -----------------
 local locationFrame = CreateFrame("FRAME","$parent.Location", minimapFrame)
@@ -205,7 +262,8 @@ mailFrame.ag = ag
 baseFrame.mailFrame = mailFrame
 
 
-
+-- Class Hall 
+GarrisonLandingPageMinimapButton:SetFrameLevel(GarrisonLandingPageMinimapButton:GetFrameLevel()+1)
 
 -- CHEAP MODULE REGISTERING ------
 V.frames.minimap = baseFrame
@@ -253,7 +311,7 @@ function EventFrame:MAIL_CLOSED()
             V.frames.minimap.mailFrame.ag:SetLooping("REPEAT")
         end     
     else
-        V.frames.minimap.mailText:SetText("")
+        V.frames.minimap.mailText:SetText(" ")
         V.frames.minimap.mailFrame.ag:Stop()
     end
 end

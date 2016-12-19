@@ -16,6 +16,7 @@ local GetFramerate = GetFramerate
 local unpack, select = unpack, select
 local min = min
 local format = string.format
+local wipe = wipe
 
 ----------------------------------
 -- Module Config
@@ -30,46 +31,33 @@ local module = {
 ----------------------------------
 -- Functions
 ----------------------------------
+local function formatMem(memory)
+    local mult = 10^1
+    if memory > 999 then
+        local mem = ((memory/1024) * mult) / mult
+        return format(megaByteString, mem)
+    else
+        local mem = (memory * mult) / mult
+        return format(kiloByteString, mem)
+    end
+end
+
 local function OnEnter(self)
     if InCombatLockdown() then return end
-    -- tt = Tooltip(self)
-    --GameTooltip:SetTemplate("Default", nil, true)
-    --local r, g, b = GameTooltip:GetBackdropColor()
-    -- GameTooltip:SetBackdropColor(0, 0, 0, .45)
-    -- GameTooltip:SetBackdropBorderColor(0, 0, 0, 0)
-    -- local object = GameTooltip
-    -- for i=1, object:GetNumRegions() do
-    --     local region = select(i, object:GetRegions())
-    --     if region and region:GetObjectType() == "Texture" then
-    --         region:SetTexture(nil)
-    --     end
-    -- end
-    --GameTooltip:SetOwner(self,"ANCHOR_BOTTOMRIGHT",0,20)
-    -- tt:AddLine(module.name)
-    -- tt:AddLine(" ")
-    -- tt:AddDoubleLine("links", "rechts")
-    -- tt:AddDoubleLine("links", "rechts")
-
-    -- tt:Show()
-    --GameTooltip:SetOwner(self,"ANCHOR_BOTTOMRIGHT",0,20)
-    -- local object = GameTooltip
-    -- for i=1, object:GetNumRegions() do
-    --     local region = select(i, object:GetRegions())
-    --     if region and region:GetObjectType() == "FontString" then
-    --         texture = region:GetName()
-    --         print(texture)
-    --     end
-    -- end
-    -- print(GameTooltip.TextLeft1:GetText())
-    -- GameTooltip:AddLine(module.name)
-    -- GameTooltip:AddDoubleLine("links", "rechts")
-    -- GameTooltip:AddDoubleLine("links", "rechts")
-    -- GameTooltip:Show()
-
+    local tt = V.tt or Tooltip()
+    tt:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 0, self:GetHeight())
+    tt:SetWidth(V.defaults.tooltip.width)
+    tt:SetBackdropColor(unpack(V.defaults.tooltip.background))
+    tt:SetMinimumWidth(160) 
+    tt:AddLine(module.name)
+    -- Addon Memory Usage
+    tt:AddLine("Addon Memory Usage", .6, .6 ,.6)
+    local mem = GetAddOnMemoryUsage("VuBar")
+    tt:AddDoubleLine("VuBar", formatMem(mem), 1, 1, 1, 1, 1, 1)
 end
 
 local function OnLeave()
-    if ( GameTooltip:IsShown() ) then GameTooltip:Hide() end
+    if ( V.tt:IsShown() ) then V.tt:Hide() end
 end
 
 local function OnUpdate(self, e)

@@ -33,7 +33,10 @@ local module = {
     padding = 0,
     barHeight = 14
 }
-V.frames.showHonor = true
+-- V.frames.showHonor = true
+-- if V.constants.player.level > 101 then
+--     V.frames.showArtifact = true
+-- end
 
 ----------------------------------
 -- Functions
@@ -182,9 +185,9 @@ local function UpdateBars(newLevel)
     end
     local showRep = name
     local artifactItemID, _, _, _, artifactTotalXP, artifactPointsSpent, _, _, _, _, _, _, artifactMaxed = C_ArtifactUI.GetEquippedArtifactInfo()
-    local showArtifact = artifactItemID and not artifactMaxed and (UnitLevel("player") >= MAX_PLAYER_LEVEL or GetCVarBool("showArtifactXPBar"))
+    local showArtifact = artifactItemID and not artifactMaxed --and (UnitLevel("player") >= MAX_PLAYER_LEVEL or GetCVarBool("showArtifactXPBar")) or V.frames.showArtifact
     local showXP = newLevel < MAX_PLAYER_LEVEL and not IsXPUserDisabled()
-    local showHonor = newLevel >= MAX_PLAYER_LEVEL and (IsWatchingHonorAsXP() or InActiveBattlefield() or IsInActiveWorldPVP()) or V.frames.showHonor
+    local showHonor = newLevel >= MAX_PLAYER_LEVEL --and (IsWatchingHonorAsXP() or InActiveBattlefield() or IsInActiveWorldPVP()) or V.frames.showHonor
     if showRep then GetReputation(i); i = i + 1; end
     if showArtifact then GetArtifactPower(i); i = i + 1; end
     if showXP then GetExperience(i); i = i + 1; end
@@ -281,3 +284,28 @@ local events = {
 for i, e in ipairs(events) do
     if not EventFrame:IsEventRegistered(e) then EventFrame:RegisterEvent(e) end
 end
+
+-- Overhaul ---
+-- local function CreateBars()
+
+-- end
+
+-- local function Update(i)
+--     -- I have to get the bar ID
+--     -- Experience Data
+--     local function Experience(i)
+
+--     end
+--     -- Reputation Data
+--     local function Reputation(i)
+
+--     end
+--     -- Artifact Data
+--     local function Artifact(i)
+
+--     end
+--     -- Honor Data
+--     local function Honor(i)
+
+--     end
+-- end

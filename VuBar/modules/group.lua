@@ -5,6 +5,8 @@ local addon, ns = ...
 local V = ns.V
 local EventHandler, EventFrame, DebugFrame = V.EventHandler, V.EventFrame, V.DebugFrame
 local elapsed = 0
+local roles = { ["DAMAGER"] = 0, ["HEALER"] = 0, ["TANK"] = 0 }
+local dead = CopyTable(roles)
 
 ----------------------------------
 -- Blizz Api & Variables
@@ -14,6 +16,7 @@ local IsInGroup = IsInGroup
 local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 local GetLootMethod = GetLootMethod
 local UnitIsUnit = UnitIsUnit
+local CopyTable = CopyTable
 
 -- LUA Functions -----------------
 local format = string.format
@@ -87,8 +90,8 @@ end
 
 -- DPS, Healers & Tanks ----------
 local function GroupComposition()
-    local roles = {}
-    roles.DAMAGER, roles.HEALER, roles.TANK = 0,0,0 
+    -- local roles = {}
+    -- roles.DAMAGER, roles.HEALER, roles.TANK = 0,0,0 
     local groupSize = GetNumGroupMembers()
     if not IsInRaid() then
         local isArena = IsActiveBattlefieldArena()
@@ -165,9 +168,6 @@ end
 
 -- Group Health ------------------
 local function GroupOnUpdate(self, e)
-    local roles = {}
-    roles.DAMAGER, roles.HEALER, roles.TANK = 0,0,0
-    local dead = roles
     local groupSize = GetNumGroupMembers()
     local damagerHealth, healerHealth, tankHealth
     elapsed = elapsed + e
@@ -225,7 +225,8 @@ local function GroupOnUpdate(self, e)
         else
             tankHealth = roles.TANK
         end
-        V.frames.group.tankTotalText:SetText(tankHealth) 
+        V.frames.group.tankTotalText:SetText(tankHealth)
+        local dead = { ["DAMAGER"] = 0, ["HEALER"] = 0, ["TANK"] = 0 } 
         elapsed = 0
     end
 end
@@ -311,7 +312,7 @@ baseFrame.lootMethod = lootMethodRText
 local groupCompositionFrame = CreateFrame("FRAME", "$parent.Composition", baseFrame)
 groupCompositionFrame:SetSize(V.defaults.frame.width, 40)
 groupCompositionFrame:SetPoint("TOP", 0, -(55+module.padding))
-groupCompositionFrame:SetScript("OnUpdate", GroupOnUpdate)
+--groupCompositionFrame:SetScript("OnUpdate", GroupOnUpdate)
 module.height = module.height+groupCompositionFrame:GetHeight()
 
 -- Tanks -------------------------
@@ -481,7 +482,7 @@ function EventFrame:INSTANCE_GROUP_SIZE_CHANGED()
     V.frames.group.dpsTotalText:SetText(roles.DAMAGER)
     -- Type of group
     V.frames.group.groupTypeName:SetText(GroupTypeText())
-    if notIsInGroup() and not IsInRaid() then
+    if not IsInGroup() and not IsInRaid() then
         V.frames.group:Hide()
     end         
 end

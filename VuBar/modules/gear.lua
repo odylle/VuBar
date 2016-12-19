@@ -44,16 +44,16 @@ local function Durability()
     return floor(durability)
 end
 
-local function OnUpdate(self, e)
-    elapsed = elapsed + e
-    if elapsed >= 1 then
-            local _, equipped = GetAverageItemLevel()
-            if self.iLevelText:GetText() ~= floor(equipped) then
-                self.iLevelText:SetText(floor(equipped))
-            end
-        elapsed = 0
-    end
-end
+-- local function OnUpdate(self, e)
+--     elapsed = elapsed + e
+--     if elapsed >= 1 then
+--             local _, equipped = GetAverageItemLevel()
+--             if self.iLevelText:GetText() ~= floor(equipped) then
+--                 self.iLevelText:SetText(floor(equipped))
+--             end
+--         elapsed = 0
+--     end
+-- end
 
 local function LootSpec()
     local specID = GetLootSpecialization()
@@ -74,7 +74,7 @@ local baseFrame = CreateFrame("FRAME","$parent."..module.name, V.frames.left)
 baseFrame:SetParent(V.frames.left)
 baseFrame:SetPoint(V.defaults.frame.anchor,0,-120)
 baseFrame:SetSize(V.defaults.frame.width, module.height)
-baseFrame:SetScript('OnUpdate', OnUpdate)
+--baseFrame:SetScript('OnUpdate', OnUpdate)
 if V.debug then DebugFrame(baseFrame) end
 
 ----------------------------------
@@ -177,13 +177,21 @@ function EventFrame:PLAYER_LOOT_SPEC_UPDATED()
     V.frames.gear.lootspecText:SetText(LootSpec())
 end
 
+function EventFrame:PLAYER_AVG_ITEM_LEVEL_UPDATE()
+    local _, equipped = GetAverageItemLevel()
+    if V.frames.gear.iLevelText:GetText() ~= floor(equipped) then
+        V.frames.gear.iLevelText:SetText(floor(equipped))
+    end    
+end
+
 -- EVENTS ------------------------
 local events = {
     "PLAYER_ENTERING_WORLD",
     "UPDATE_INVENTORY_DURABILITY",
     "ACTIVE_TALENT_GROUP_CHANGED",
     "PLAYER_SPECIALIZATION_CHANGED",
-    "PLAYER_LOOT_SPEC_UPDATED"
+    "PLAYER_LOOT_SPEC_UPDATED",
+    "PLAYER_AVG_ITEM_LEVEL_UPDATE",
 }
 -- REGISTER IF NOT REGISTERED ----
 for i, e in ipairs(events) do

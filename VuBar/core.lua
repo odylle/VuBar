@@ -104,10 +104,6 @@ V.constants = constants
 ----------------------------------
 -- Modules Handling - NEW
 ----------------------------------
-local function IterateModules(modules)
-
-end
-
 local modules = {}
 V.modules = modules
 
@@ -189,11 +185,11 @@ V.EventFrame = EventFrame
 ----------------------------------
 -- Events
 ----------------------------------
-local D = {}
+local S = {}
 function EventFrame:ADDON_LOADED(arg)
     if arg ~= addon then return end
     -- Load Saved variables
-    local VARS = CopyTable(D, VuBarVars)
+    local VARS = CopyTable(S, VuBarVars)
     ns.VARS = VARS
 
     if not VARS[constants.player.realm] then VARS[constants.player.realm] = {} end
@@ -214,7 +210,7 @@ end
 
 function EventFrame:PLAYER_LOGOUT()
     -- Save Variables
-    VuBarVars = DiffTable(D, ns.VARS)
+    VuBarVars = DiffTable(S, ns.VARS)
 end
 
 ----------------------------------

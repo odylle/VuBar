@@ -65,27 +65,20 @@ local function gold_OnEnter(self)
     tt:SetBackdropColor(unpack(V.defaults.tooltip.background))
     tt:AddLine(module.name)
     -- Session Gold Statistics
-    tt:AddLine(" ")
     tt:AddLine("Session Statistics", .6, .6 ,.6)
     -- local session_start = stripSmallChange(VuBarVars[V.constants.player.realm][V.constants.player.name]["gold"] or GetMoney())
     -- local session_current = stripSmallChange(GetMoney())
-    local session_start = VuBarVars[V.constants.player.realm][V.constants.player.name]["gold"] or ns.playerData["gold"]
-    local session_current = ns.playerData["gold"]
+    local session_start
+    if type(VuBarVars) == "table" then
+        session_start = VuBarVars[V.constants.player.realm][V.constants.player.name]["gold"] 
+    else session_start = ns.playerData["gold"] end
+    local session_current = GetMoney()
     tt:AddDoubleLine("Gold", stripSmallChange(session_current).."g", 1, 1, 1, 1, 1, 1)
     if session_start > session_current then
         tt:AddDoubleLine(" Loss", stripSmallChange(session_start-session_current).."g", 1, 0, 0, 1, 0, 0)
     elseif session_start < session_current then
         tt:AddDoubleLine(" Gain", stripSmallChange(session_current-session_start).."g", 0, .8, 0, 0, .8, 0)
     end
-    -- ns.playerData["gold"] = session_current
-    -- --tt:AddDoubleLine("Session Start", session_start, 1, 1, 1, 1, 1, 1)
-    -- tt:AddDoubleLine("Gold", session_current.."g", 1, 1, 1, 1, 1, 1)
-    -- if session_start > session_current then
-    --     tt:AddDoubleLine(" Loss", "-"..(session_start-session_current.."g "), 1, 0, 0, 1, 0, 0)
-    -- elseif session_start < session_current then
-    --     tt:AddDoubleLine(" Gain", "+"..(session_current-session_start.."g "), 0, .8, 0, 0, .8, 0)
-    -- end
-    -- Other Characters
     tt:AddLine(" ")
     tt:AddLine("Realm Statistics", .6, .6 ,.6)
     local realmGold = 0

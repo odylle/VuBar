@@ -3,7 +3,7 @@ local addon, ns = ...
 -- Variables
 ----------------------------------
 local V = ns.V
-local EventHandler, DebugFrame = V.EventHandler, V.DebugFrame
+local EventHandler, DebugFrame, LocalClassColor = V.EventHandler, V.DebugFrame, V.LocalClassColor
 
 ----------------------------------
 -- Blizz Api & Variables
@@ -14,9 +14,12 @@ local GetNumGuildMembers = GetNumGuildMembers
 local BNGetNumFriends = BNGetNumFriends
 local ToggleGuildFrame = ToggleGuildFrame
 local ToggleFriendsFrame = ToggleFriendsFrame
+local WrapTextInColorCode = WrapTextInColorCode
+local GetClassColor = GetClassColor
 
 -- LUA Functions -----------------
 local unpack = unpack
+local format = string.format
 
 ----------------------------------
 -- Module Config
@@ -69,6 +72,38 @@ friendsFrame:SetScript("OnClick", function(self, button, down)
         ToggleFriendsFrame()
     end    
 end)
+friendsFrame:SetScript("OnEnter", function()
+    local tt = V.tt or Tooltip()
+    tt:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 0, self:GetHeight())
+    tt:SetMinimumWidth(160)
+    tt:SetBackdropColor(unpack(V.defaults.tooltip.background))
+    tt:AddLine(module.name..":Friends")
+    tt:AddLine("")    
+    tt:AddLine("Online", .6, .6 ,.6)
+    -- InGame
+    for i = 1, GetNumFriends() do
+        local name, lvl, class, area, online, status, note = GetFriendInfo(i)
+        if (online) then
+            classColor = LocalClassColor(class)
+            if not status then status = "" end
+            lText = format("%s %s %s", lvl, WrapTextInColorCode(name, classColor), status)
+            rText = WrapTextInColorCode(area, "ffffffff")
+            tt:AddDoubleLine(lText, rText)
+        end
+    end
+    -- Battle.Net
+    for i = 1, BNGetNumFriends() do
+        local BNid, BNname, battleTag, _, toonname, toonid, client, online, lastonline, isafk, isdnd, broadcast, note = BNGetFriendInfo(i)
+        if client ~= "WoW" and (online) then
+            lText = format("%s %s", BNname, battleTag)
+            rText = client
+            tt:AddDoubleLine(lText, rText)
+        end
+    end
+end)
+friendsFrame:SetScript("OnLeave", function()
+    if (V.tt:IsShown()) then V.tt:Hide() end
+end)
 
 local friendsTText = friendsFrame:CreateFontString(nil, "OVERLAY")
 friendsTText:SetFont(V.defaults.text.font.main, V.defaults.text.large)
@@ -100,6 +135,41 @@ guildFrame:SetScript("OnClick", function(self, button, down)
             print"|cff6699FFSXUI|r: You are not in a guild"
         end
     end
+end)
+guildFrame:SetScript("OnEnter", function()
+    if not (IsInGuild()) then return end
+    local tt = V.tt or Tooltip()
+    tt:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 0, self:GetHeight())
+    tt:SetMinimumWidth(160)
+    tt:SetBackdropColor(unpack(V.defaults.tooltip.background))
+    tt:AddLine(module.name..":Guild")
+    tt:AddLine("")
+    -- MOTD    
+    local guildMOTD = GetGuildRosterMOTD()
+    if guildMOTD ~= nil then
+        tt:AddLine("Message:", 1, 1, 1)
+        tt:AddLine("guildMOTD")
+        tt:AddLine("")
+    end
+    -- Members Online
+    for i = 0, select(2, GetNumGuildMembers()) do
+        local name, rank, rankIndex, level, class, zone, note, officernote, online, status, classFileName, achievementPoints, achievementRank, isMobile, canSoR = GetGuildRosterInfo(i)
+        name = WrapTextInColorCode(name, select(4, GetClassColor(classFileName)))
+        level = WrapTextInColorCode(level, "ffffffff")
+        if status == 1 then status = WrapTextInColorCode("AFK", "ffffffff") else status = "" end
+        if note ~= "" then note WrapTextInColorCode(note, "ff888888") end
+        if isMobile then
+            zone = WrapTextInColorCode("Remote", "ff666666")
+        else 
+            zone WrapTextInColorCode(zone, "ffffffff")
+        end
+        lText = format("%s %s%s%s", level, status, name, note)
+        rText = zone
+        tt:AddDoubleLine(lText, rText)
+    end
+end)
+guildFrame:SetScript("OnLeave", function()
+    if (V.tt:IsShown()) then V.tt:Hide() end
 end)
 
 local guildTText = guildFrame:CreateFontString(nil, "OVERLAY")

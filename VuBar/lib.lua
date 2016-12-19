@@ -58,7 +58,7 @@ local function DebugTable()
     local t = f:CreateFontString(nil, "OVERLAY")
     t:SetPoint("CENTER")
     t:SetHeight(400)
-    t:SetFont(V.defaults.text.font.main, V.defaults.text.xlarge)
+    t:SetFont(V.defaults.text.font.main, V.defaults.text.small)
     t:SetTextColor(unpack(V.defaults.text.color.bright))
     t:SetAllPoints()
     f.t = t

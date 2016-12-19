@@ -17,7 +17,10 @@ modules/gear.lua
 modules/social.lua
 modules/resources.lua
 modules/group.lua
+# modules/questtracker.lua
 modules/minimap.lua
 modules/bars.lua
 modules/details.lua
 # modules/calltoarms.lua
+# modules/stats.lua
+# modules/threat.lua
