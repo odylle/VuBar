@@ -21,7 +21,7 @@ local module = {
     name = "Details",
     description = "DPS Stuff!!",
     height = 0,
-    padding = 0,
+    padding = 5,
     bar = {
         number = 10,
         height = 16,
@@ -248,3 +248,129 @@ local events = {
 for i, e in ipairs(events) do
     if not EventFrame:IsEventRegistered(e) then EventFrame:RegisterEvent(e) end
 end
+
+----------------------------------
+-- OVERHAUL
+----------------------------------
+-- local function CreateWindow(name, numBars, anchor)
+--     local f = CreateFrame("FRAME", "$parent."..name, baseFrame)
+--     f:SetSize(V.defaults.frame.width, (20+(numBar*module.bar.height))
+--     f:SetPoint("TOP",0, -(anchor))
+    
+--     -- Header
+--     local header = CreateFrame("FRAME", "$parent.Header", f)
+--     header:SetSize(V.defaults.frame.width, 20)
+--     header:SetPoint("TOP", 0, 0)
+
+--     local headerText = header:CreateFontString(nil, "OVERLAY")
+--     headerText:SetFont(V.defaults.text.font.main, V.defaults.text.normal)
+--     headerText:SetTextColor(unpack(V.defaults.text.color.dim))
+--     headerText:SetJustifyH("LEFT")
+--     headerText:SetPoint("BOTTOMLEFT", header, "BOTTOMLEFT", 3, 3)
+--     f.header = headerText
+
+--     -- Bars Frame
+--     local bf = CreateFrame("FRAME", "$parent.Bars", f)
+--     bf:SetSize(V.defaults.frame.width, module.bar.number*module.bar.height)
+--     bf:SetPoint("TOP", 0, -20)
+--     f.bars = bf
+--     return f
+-- end
+
+-- local function CreateBar(i, parent)
+--     local bar = CreateFrame("STATUSBAR", "$parent.Bar"..i, parent)
+--     bar:SetStatusBarTexture(V.defaults.statusbar)
+--     bar:GetStatusBarTexture():SetHorizTile(false)
+--     bar:SetWidth(V.defaults.frame.width - 2)
+--     bar:SetHeight(module.bar.height-1)
+--     bar:SetPoint("TOP",0,- ((i*module.bar.height)-module.bar.height))
+--     bar:SetMinMaxValues(1, 100)
+--     bar:SetValue(0)
+--     bar:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
+--     bar:SetBackdropColor(0,0,0,0)
+
+--     local textLeft = bar:CreateFontString(nil, "OVERLAY") 
+--     textLeft:SetFont(V.defaults.text.font.bold, V.defaults.text.small)
+--     textLeft:SetTextColor(unpack(V.defaults.text.color.bright))
+--     textLeft:SetJustifyH("LEFT")
+--     textLeft:SetPoint("LEFT", bar, "LEFT", 2, 0)
+--     bar.name = textLeft
+
+--     local textRight = bar:CreateFontString(nil, "OVERLAY") 
+--     textRight:SetFont(V.defaults.text.font.bold, V.defaults.text.small)
+--     textRight:SetTextColor(unpack(V.defaults.text.color.bright))
+--     textRight:SetJustifyH("LEFT")
+--     textRight:SetPoint("RIGHT", bar, "RIGHT", -2, 0)
+--     bar.value = textRight
+--     return bar
+-- end
+
+-- local function ClearWindow(window)
+--     local bars = { window:GetChildren() }
+--     for _, bar in pairs(bars) do
+--         bar:SetValue(0)
+--         r, g, b = bar:GetBackdropColor()
+--         bar:SetBackdropColor(r,g,b,0)
+--         bar.name:SetText("")
+--         bar.value:SetText("")
+--     end
+-- end
+
+-- function GetDPS(combat, bars)
+--     local count = 0
+--     local playerFound = false
+--     local container = combat:GetContainer(DETAILS_ATTRIBUTE_DAMAGE)
+--     container:SortByKey("total")
+--     for i, actor in container:ListActors() do
+--         if count <= bars then
+--             if (actor:isPlayer()) then playerFound = true end
+--             if (actor:IsGroupPlayer()) and not (actor:IsEnemy()) then
+--                 if count == 1 then max = actor.total / combat:GetCombatTime() end
+--                 local displayValue = actor.total / combat:GetCombatTime()
+--                 if displayValue > 1000 then
+--                     local barValue = displayValue*(100/max)
+--                     local r,g,b = actor:GetBarColor()
+--                     displayValue = Shorten(displayValue)
+--                     table.insert(actors, { name = actor:GetOnlyName(), displayValue = displayValue, barValue = barValue, barColor = {r = r,g = g,b = b}})
+--                     count = count + 1
+--                 end 
+--             end                      
+--         end
+--     end
+--     if count <= bars then
+--         table.insert(actors, {})
+--         count = count + 1
+--     end
+--     return actors
+-- end
+
+-- -- Setup
+-- local windows = {
+--     [1] = {
+--         ["bars"] = 10,
+--         ["anchor"] = 0,
+--     },
+--     [2] = {
+--         ["bars"] = 5,
+--         ["anchor"] = module.height+module.padding
+--     }
+-- }
+
+-- -- Create
+-- for k, _ in pairs(windows) do
+--     -- Create Window
+--     local w = "Window"..k
+--     local f = CreateWindow(w, windows[k]["bars"], windows[k]["anchor"])
+--     module.height = module.height + f:GetHeight()
+--     basefame[w] = f
+--     -- Add Bars
+--     for i=1, windows[k]["bars"] do
+--         local bar = CreateBar(k, f)
+--         baseframe[w][i] = bar
+--     end
+-- end
+-- --Clear
+-- for k, _ in pairs(windows) do
+--     local w = "Window"..k
+--     ClearWindow(V.frames.details[w])
+-- end

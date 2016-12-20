@@ -192,7 +192,7 @@ local function UpdateBars(newLevel)
     if showArtifact then GetArtifactPower(i); i = i + 1; end
     if showXP then GetExperience(i); i = i + 1; end
     if showHonor then GetHonor(i); i = i + 1; end
-    for count = i, 4 do
+    for count = i, 3 do
         V.frames.bars["bar"..i]:Hide()
     end
     --return bars
@@ -210,7 +210,7 @@ if V.debug then DebugFrame(baseFrame) end
 ----------------------------------
 -- Content Frame(s)
 ----------------------------------
-for i = 1, 4 do
+for i = 1, 3 do
     local f = SpawnStatusbar(i, baseFrame)
     f:SetPoint("TOP",0,module.barHeight-(i*module.barHeight))
     f:Hide()
@@ -284,28 +284,3 @@ local events = {
 for i, e in ipairs(events) do
     if not EventFrame:IsEventRegistered(e) then EventFrame:RegisterEvent(e) end
 end
-
--- Overhaul ---
--- local function CreateBars()
-
--- end
-
--- local function Update(i)
---     -- I have to get the bar ID
---     -- Experience Data
---     local function Experience(i)
-
---     end
---     -- Reputation Data
---     local function Reputation(i)
-
---     end
---     -- Artifact Data
---     local function Artifact(i)
-
---     end
---     -- Honor Data
---     local function Honor(i)
-
---     end
--- end
