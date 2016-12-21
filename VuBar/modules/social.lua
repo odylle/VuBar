@@ -74,17 +74,18 @@ friendsFrame:SetScript("OnClick", function(self, button, down)
 end)
 friendsFrame:SetScript("OnEnter", function()
     local tt = V.tt or Tooltip()
-    tt:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 0, self:GetHeight())
+    tt:SetOwner(self, "ANCHOR_BOTTOMRIGHT", self:GetWidth(), self:GetHeight())
     tt:SetMinimumWidth(160)
+    tt:SetMaxResize(200, V.default.frame.height)
     tt:SetBackdropColor(unpack(V.defaults.tooltip.background))
-    tt:AddLine(module.name..":Friends")
+    tt:AddLine(module.name..": Friends")
     tt:AddLine("")    
     tt:AddLine("Online", .6, .6 ,.6)
     -- InGame
     for i = 1, GetNumFriends() do
         local name, lvl, class, area, online, status, note = GetFriendInfo(i)
         if (online) then
-            classColor = LocalClassColor(class)
+            classColor = select(4, LocalClassColor(class))
             if not status then status = "" end
             lText = format("%s %s %s", lvl, WrapTextInColorCode(name, classColor), status)
             rText = WrapTextInColorCode(area, "ffffffff")
@@ -92,11 +93,12 @@ friendsFrame:SetScript("OnEnter", function()
         end
     end
     -- Battle.Net
+    tt:AddLine(" ")
     for i = 1, BNGetNumFriends() do
         local BNid, BNname, battleTag, _, toonname, toonid, client, online, lastonline, isafk, isdnd, broadcast, note = BNGetFriendInfo(i)
         if client ~= "WoW" and (online) then
-            lText = format("%s %s", BNname, battleTag)
-            rText = client
+            lText = format("%s %s", WrapTextInColorCode(BNname,"ff4876ff"),WrapTextInColorCode(toonname, "ff888888"))
+            rText = WrapTextInColorCode(client, "ffffffff")
             tt:AddDoubleLine(lText, rText)
         end
     end
@@ -141,29 +143,31 @@ guildFrame:SetScript("OnEnter", function()
     local tt = V.tt or Tooltip()
     tt:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 0, self:GetHeight())
     tt:SetMinimumWidth(160)
+    tt:SetMaxResize(200, V.default.frame.height)
     tt:SetBackdropColor(unpack(V.defaults.tooltip.background))
-    tt:AddLine(module.name..":Guild")
-    tt:AddLine("")
+    tt:AddLine(select(1, GetGuildInfo("player")))
+    tt:AddLine(" ")
     -- MOTD    
     local guildMOTD = GetGuildRosterMOTD()
     if guildMOTD ~= nil then
-        tt:AddLine("Message:", 1, 1, 1)
-        tt:AddLine("guildMOTD")
-        tt:AddLine("")
+        tt:AddLine("Message:", .6, .6, .6)
+        tt:AddLine(guildMOTD, 1, 1, 1)
+        tt:AddLine(" ")
     end
     -- Members Online
-    for i = 0, select(2, GetNumGuildMembers()) do
+    local numOnline = select(2, GetNumGuildMembers())
+    for i = 1, numOnline do
         local name, rank, rankIndex, level, class, zone, note, officernote, online, status, classFileName, achievementPoints, achievementRank, isMobile, canSoR = GetGuildRosterInfo(i)
         name = WrapTextInColorCode(name, select(4, GetClassColor(classFileName)))
         level = WrapTextInColorCode(level, "ffffffff")
         if status == 1 then status = WrapTextInColorCode("AFK", "ffffffff") else status = "" end
-        if note ~= "" then note WrapTextInColorCode(note, "ff888888") end
+        if note ~= "" then note = WrapTextInColorCode(note, "ff888888") end
         if isMobile then
             zone = WrapTextInColorCode("Remote", "ff666666")
         else 
-            zone WrapTextInColorCode(zone, "ffffffff")
+            zone = WrapTextInColorCode(zone, "ffffffff")
         end
-        lText = format("%s %s%s%s", level, status, name, note)
+        lText = format("%s %s%s %s", level, status, name, note)
         rText = zone
         tt:AddDoubleLine(lText, rText)
     end

@@ -5,32 +5,6 @@ local addon, ns = ...
 local V = ns.V
 local EventHandler, Tooltip, DebugFrame = V.EventHandler, V.Tooltip, V.DebugFrame
 
-local primary = { [1] = "Strength", [2] = "Agility", [3] = "Intellect"}
-local secondary = {
-    [1] = "Haste",                  --         GetHaste()
-    [2] = "Haste",                  -- Ranged: GetRangedHaste()
-    [3] = "Haste",                  -- Melee:  GetMeleeHaste()
-    [4] = "Critical Strike",        -- Ranged: GetRangedCritChance()
-    [5] = "Critical Strike",        -- Melee:  GetCritChance()
-    [6] = "Critical Strike",        -- Caster: GetSpellCritChance()
-    [7] = "Mastery",                --         GetMastery()
-    [8] = "Versatility"             --         GetVersatilityBonus()
-
-}
-local stats = {
-    ["DEATHKNIGHT"] = {
-        ["Blood"] = {3,5,8,7},
-        ["Frost"] = {3,5,8,7},
-        ["Unholy"] = {5,3,7,8},
-    },
-    ["Hunter"] = {
-        ["Marksmanship"] = {
-            [1] = "Mastery",
-            [2] = 
-        }
-    }
-}
-
 ----------------------------------
 -- Blizz Api & Variables
 ----------------------------------
@@ -42,11 +16,8 @@ local stats = {
 -- Module Config
 ----------------------------------
 local module = {
-    name = "Stats",
-    description = "Display Stat Priority",
-    height = 0,
-    padding = 5,
-    showStats = 3
+    name = "Some Name",
+    description = "Some Description",
 }
 
 ----------------------------------

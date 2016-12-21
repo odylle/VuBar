@@ -73,10 +73,11 @@ local function DebugFrame(f)
 end
 V.DebugFrame = DebugFrame
 
+-- Help Frame --------------------
 local function DebugTable()
     local f = CreateFrame("FRAME", "$parent.Minimap", UIParent)
-    f:SetSize(200, 400)
-    f:SetPoint("TOP")
+    f:SetSize(200, 200)
+    f:SetPoint("TOP", 0, -100)
     f:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
     f:SetBackdropColor(0, 0, 0, 0.6)
 
@@ -99,3 +100,27 @@ local function Tooltip(self)
     return tt
 end
 V.Tooltip = Tooltip
+
+-- Modularity ---------------------
+-- local VuBarModules = {}
+-- VuBarModules.__index = VuBarModules
+
+-- local function VuBarModules.New(name, side, description)
+--     local self = setmetatable({}, VuBarModules)
+--     self.name = name
+--     self.side = side
+--     self.description = description
+--     return self
+-- end
+
+-- local function VuBarModules.CreateBase(self)
+--     local f = CreateFrame("BUTTON","$parent."..self.name, V.frames[self.side])
+--     f:SetParent(V.frames[self.side])
+--     f:SetPoint(V.defaults.frame.anchor)
+--     -- f:SetSize(V.defaults.frame.width, module.height)
+--     self.base = f
+-- end
+
+-- local function VuBarModules.Content(self, template)
+
+-- end

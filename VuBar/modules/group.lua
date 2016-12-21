@@ -29,7 +29,6 @@ local module = {
     description = "Display party and raid info",
     height = 0,
     padding = 20,
-
 }
 
 ----------------------------------
@@ -91,7 +90,7 @@ end
 -- DPS, Healers & Tanks ----------
 local function GroupComposition()
     -- local roles = {}
-    -- roles.DAMAGER, roles.HEALER, roles.TANK = 0,0,0 
+    roles["DAMAGER"], roles["HEALER"], roles["TANK"] = 0,0,0 
     local groupSize = GetNumGroupMembers()
     if not IsInRaid() then
         local isArena = IsActiveBattlefieldArena()
@@ -172,9 +171,9 @@ local function GroupOnUpdate(self, e)
     local damagerHealth, healerHealth, tankHealth
     elapsed = elapsed + e
     if elapsed >= 1 then
-        roles.DAMAGER = V.frames.group.dpsTotalText:GetText() or 0
-        roles.HEALER = V.frames.group.healerTotalText:GetText() or 0
-        roles.TANK = V.frames.group.tankTotalText:GetText() or 0
+        roles["DAMAGER"] = V.frames.group.dpsTotalText:GetText()
+        roles["HEALER"] = V.frames.group.healerTotalText:GetText()
+        roles["TANK"] = V.frames.group.tankTotalText:GetText()
         if IsInRaid() then
             for i = 1, groupSize do
                 local role = UnitGroupRolesAssigned("raid"..i)
@@ -226,10 +225,22 @@ local function GroupOnUpdate(self, e)
             tankHealth = roles.TANK
         end
         V.frames.group.tankTotalText:SetText(tankHealth)
-        local dead = { ["DAMAGER"] = 0, ["HEALER"] = 0, ["TANK"] = 0 } 
+        dead = { ["DAMAGER"] = 0, ["HEALER"] = 0, ["TANK"] = 0 } 
         elapsed = 0
     end
 end
+
+-- Raid Target Icons -------------
+local RaidTargets = 
+    ["RAID_TARGET_1"] = { text = RAID_TARGET_1, dist = 0, checkable = 1, color = {r = 1.0, g = 0.92, b = 0}, icon = "Interface\\TargetingFrame\\UI-RaidTargetingIcons", tCoordLeft = 0, tCoordRight = 0.25, tCoordTop = 0, tCoordBottom = 0.25 },
+    ["RAID_TARGET_2"] = { text = RAID_TARGET_2, dist = 0, checkable = 1, color = {r = 0.98, g = 0.57, b = 0}, icon = "Interface\\TargetingFrame\\UI-RaidTargetingIcons", tCoordLeft = 0.25, tCoordRight = 0.5, tCoordTop = 0, tCoordBottom = 0.25 },
+    ["RAID_TARGET_3"] = { text = RAID_TARGET_3, dist = 0, checkable = 1, color = {r = 0.83, g = 0.22, b = 0.9}, icon = "Interface\\TargetingFrame\\UI-RaidTargetingIcons", tCoordLeft = 0.5, tCoordRight = 0.75, tCoordTop = 0, tCoordBottom = 0.25 },
+    ["RAID_TARGET_4"] = { text = RAID_TARGET_4, dist = 0, checkable = 1, color = {r = 0.04, g = 0.95, b = 0}, icon = "Interface\\TargetingFrame\\UI-RaidTargetingIcons", tCoordLeft = 0.75, tCoordRight = 1, tCoordTop = 0, tCoordBottom = 0.25 },
+    ["RAID_TARGET_5"] = { text = RAID_TARGET_5, dist = 0, checkable = 1, color = {r = 0.7, g = 0.82, b = 0.875}, icon = "Interface\\TargetingFrame\\UI-RaidTargetingIcons", tCoordLeft = 0, tCoordRight = 0.25, tCoordTop = 0.25, tCoordBottom = 0.5 },
+    ["RAID_TARGET_6"] = { text = RAID_TARGET_6, dist = 0, checkable = 1, color = {r = 0, g = 0.71, b = 1}, icon = "Interface\\TargetingFrame\\UI-RaidTargetingIcons", tCoordLeft = 0.25, tCoordRight = 0.5, tCoordTop = 0.25, tCoordBottom = 0.5 },
+    ["RAID_TARGET_7"] = { text = RAID_TARGET_7, dist = 0, checkable = 1, color = {r = 1.0, g = 0.24, b = 0.168}, icon = "Interface\\TargetingFrame\\UI-RaidTargetingIcons", tCoordLeft = 0.5, tCoordRight = 0.75, tCoordTop = 0.25, tCoordBottom = 0.5 },
+    ["RAID_TARGET_8"] = { text = RAID_TARGET_8, dist = 0, checkable = 1, color = {r = 0.98, g = 0.98, b = 0.98}, icon = "Interface\\TargetingFrame\\UI-RaidTargetingIcons", tCoordLeft = 0.75, tCoordRight = 1, tCoordTop = 0.25, tCoordBottom = 0.5 },
+}
 
 ----------------------------------
 -- Base Frame
@@ -375,6 +386,30 @@ dpsTotalBText:SetJustifyH("CENTER")
 dpsTotalBText:SetPoint("BOTTOM", dpsFrame, "BOTTOM", 0, 1)
 dpsTotalBText:SetText("dps")
 
+-- Raid Leader Tools -------------
+local AssistantFrame = CreateFrame("FRAME", "$parent.Assistant", baseFrame)
+AssistantFrame:SetParent(groupCompositionFrame)
+AssistantFrame:SetPoint("TOP", groupCompositionFrame, "TOP", 0,0)
+AssistantFrame:SetSize(V.defaults.frames.width, 0)
+
+-- Raid Targets ------------------
+local RaidTargetFrame = CreateFrame("FRAME", "$parent.RaidTargetFrame", AssistantFrame)
+RaidTargetFrame:SetPoint("TOP", 0, 0)
+RaidTargetFrame:SetSize(V.defaults.frames.width, 20)
+
+local targetOffset = 0
+local raidTargetButtonSize = V.defaults.frame.width/8
+for i=1, 8 do
+    local RaidTargetButton = CreateFrame("BUTTON", "$parent.RT"..i, RaidTargetFrame)
+    RaidTargetButton:SetSize(raidTargetButtonSize-2,raidTargetButtonSize)
+    RaidTargetButton:SetPoint("LEFT",0,1+((raidTargetButtonSize-2)*i)-raidTargetButtonSize)
+    RaidTargetButton:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
+    local color = RaidTargets["RAID_TARGET_"..i][color]
+    RaidTargetButton:SetBackdropColor(color.r, color.g, color.b, 0.8)
+end
+
+AssistantFrame:SetHeight(RaidTargetFrame:GetHeight())
+module.height = module.height+AssistantFrame:GetHeight()
 
 -- Recalc. baseFrame height ------
 module.height = module.height+module.padding
@@ -488,7 +523,10 @@ function EventFrame:INSTANCE_GROUP_SIZE_CHANGED()
 end
 
 function EventFrame:PLAYER_SPECIALIZATION_CHANGED()
-
+    local roles = GroupComposition()
+    V.frames.group.healerTotalText:SetText(roles.HEALER)
+    V.frames.group.tankTotalText:SetText(roles.TANK)
+    V.frames.group.dpsTotalText:SetText(roles.DAMAGER)
 end
 
 function EventFrame:PLAYER_DIFFICULTY_CHANGED()

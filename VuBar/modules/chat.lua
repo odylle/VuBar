@@ -5,32 +5,6 @@ local addon, ns = ...
 local V = ns.V
 local EventHandler, Tooltip, DebugFrame = V.EventHandler, V.Tooltip, V.DebugFrame
 
-local primary = { [1] = "Strength", [2] = "Agility", [3] = "Intellect"}
-local secondary = {
-    [1] = "Haste",                  --         GetHaste()
-    [2] = "Haste",                  -- Ranged: GetRangedHaste()
-    [3] = "Haste",                  -- Melee:  GetMeleeHaste()
-    [4] = "Critical Strike",        -- Ranged: GetRangedCritChance()
-    [5] = "Critical Strike",        -- Melee:  GetCritChance()
-    [6] = "Critical Strike",        -- Caster: GetSpellCritChance()
-    [7] = "Mastery",                --         GetMastery()
-    [8] = "Versatility"             --         GetVersatilityBonus()
-
-}
-local stats = {
-    ["DEATHKNIGHT"] = {
-        ["Blood"] = {3,5,8,7},
-        ["Frost"] = {3,5,8,7},
-        ["Unholy"] = {5,3,7,8},
-    },
-    ["Hunter"] = {
-        ["Marksmanship"] = {
-            [1] = "Mastery",
-            [2] = 
-        }
-    }
-}
-
 ----------------------------------
 -- Blizz Api & Variables
 ----------------------------------
@@ -42,25 +16,35 @@ local stats = {
 -- Module Config
 ----------------------------------
 local module = {
-    name = "Stats",
-    description = "Display Stat Priority",
-    height = 0,
-    padding = 5,
-    showStats = 3
+    name = "Chat",
+    description = "Display Chat Frames",
+    height = 200,
+    width = 360,
+    hOffset = 160+5,
 }
 
 ----------------------------------
 -- Functions
 ----------------------------------
+local function ChatBase(side)
+    local f = CreateFrame("FRAME","$parent."..module.name..side, V.frames[side])
+    f:SetParent(V.frames[side])
+    if side == "right" then module.hOffset = -(module.hOffset) end
+    f:SetPoint("BOTTOM",module.hOffset,5)
+    f:SetSize(module.width, module.height)
+    f:SetBackdrop({ bgFile = "Interface\\BUTTONS\\WHITE8X8", tile = true, tileSize = 8 })
+    f:SetBackdropColor(0, 0, 0, 0.5)
+end
+
 
 ----------------------------------
 -- Base Frame
 ----------------------------------
-local baseFrame = CreateFrame("FRAME","$parent."..module.name, V.frames.left)
-baseFrame:SetParent(V.frames.left)
-baseFrame:SetPoint("BOTTOM",0,0,)
-baseFrame:SetSize(V.defaults.frame.width, module.height)
-if V.debug then DebugFrame(baseFrame) end
+local sides = {"left", "right"}
+for _, side in pairs(sides) do
+    local f = ChatBase(side)
+    V.module[module.name][side] = f
+end
 
 ----------------------------------
 -- Content Frame(s)

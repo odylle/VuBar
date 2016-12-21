@@ -159,6 +159,10 @@ EventFrame:SetScript("OnEvent", V.EventHandler)
 function EventFrame:PLAYER_ENTERING_WORLD()
     V.frames.gear.durabilityText:SetText(Durability().."%")
     V.frames.gear.lootspecText:SetText(LootSpec())
+    local _, equipped = GetAverageItemLevel()
+    if V.frames.gear.iLevelText:GetText() ~= floor(equipped) then
+        V.frames.gear.iLevelText:SetText(floor(equipped))
+    end 
 end
 
 function EventFrame:UPDATE_INVENTORY_DURABILITY()
